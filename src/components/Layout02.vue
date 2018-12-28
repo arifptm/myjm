@@ -26,7 +26,7 @@
     </v-layout>
 
     <v-layout row class="abs-top-right">
-      <v-flex xs12>
+      <v-flex xs12> 
         <v-layout row wrap>
           <v-flex offset-xs4 xs8 class="cpa-2 text-xs-right"> 
             <div :class="settings.mos_font+ ' mosname yellow--text text--lighten-4 ma-0 black-shadow2'" v-html="settings.mos_name"></div>

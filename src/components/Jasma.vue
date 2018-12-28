@@ -231,11 +231,10 @@
         
         playList: [],
         //murottal_file_index: 0,
-        playingIndex: '',
-        
+        playingIndex: '',        
       }
     },
-
+ 
     created(){
       this.getSettings() 
       this.getClock() 
