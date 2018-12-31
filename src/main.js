@@ -13,9 +13,10 @@ import store from './store'
 
 
 import VueCarousel from 'vue-carousel';
+import i18n from './i18n'
 
 Vue.use(VueCarousel);
-
+Vue.use(VueSweetalert2);
 
 require('typeface-aladin')
 require('typeface-eczar')
@@ -30,5 +31,8 @@ Vue.config.productionTip = false
 
 new Vue({
   store,
+  i18n,
   render: h => h(App)
 }).$mount('#app')
+
+// i18n.locale = ''

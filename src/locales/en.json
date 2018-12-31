@@ -1,0 +1,19 @@
+{
+  "message": "hello",
+  "Imsyak": "Imsak",
+  "Shubuh": "Fajr",
+  "Syuruq":"Syuruq",
+  "Dzuhur": "Zuhr",
+  "Ashar": "Asr",
+  "Maghrib": "Maghrib",
+  "Isya": "Isha'",
+
+  "Maulid": "Mawlid an-Nabi",
+  "Isra Mi'raj": "Laylat al-Mi'raj",
+  "Ramadhan": "Ramadan",
+  "Idul Fitri": "Eid al-Fitr",
+  "Idul Adha": "Eid al-Adha",
+  "Tahun baru": "Islamic New Year",
+
+  "Demo Mode": "Demo Mode"
+}

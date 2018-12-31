@@ -5,11 +5,12 @@
       <v-flex xs12>        
           <v-img v-if="backgroundSlides ==''" :src="$store.state.baseUrl+'/static/images/jbbg.jpg'" ></v-img>
 
-          <vue-flux v-else style="z-index:0;"
+          <vue-flux style="z-index:0;" v-if="showFlux === true && backgroundSlides !=''"
             :options="fluxOptions"
             :images="backgroundSlides"
             :transitions="backgroundTransition" 
-            :transitionOptions="fluxTransitionOptions"
+            :transitionOptions="fluxTransitionOptions"   
+            ref="slider"         
           ></vue-flux> 
 
       </v-flex>     
@@ -19,8 +20,8 @@
         <v-flex xs2 class="text-xs-center blackopc cpx-1 cpt-1">            
           <v-card :class="'cmy-1 ' + color[k]" v-for="item, k in filteredSchedule" :key="item.index">
             <div class="sc_name_arb yellow--text" v-if="settings.arabic_sc_name == 1 ">{{ item.ar_name }}</div>
-            <div class="sc_name yellow--text" v-else><b>{{ item.name }} </b></div>
-            <div class="sc_time white--text font-weight-medium">{{  $moment(item.time.date).format('HH:mm') }}</div>
+            <div class="sc_name yellow--text" v-else><b>{{ $t(item.name) }} </b></div>
+            <div class="sc_time white--text font-weight-medium">{{  $moment(item.time.date).locale($store.state.locale).format('HH:mm') }}</div>
           </v-card>
         </v-flex>        
     </v-layout>
@@ -37,8 +38,8 @@
 
         <v-layout row wrap>
           <v-flex xs3 offset-xs9 class="cpr-1 whiteopc cmy-05 white-shadow2">
-              <div class="mday grey--text text--darken-3 font-weight-bold">{{ $moment().format('dddd,') }}</div>
-              <div class="mdatem black--text font-weight-bold">{{ $moment().format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#666;" >M</span></div>
+              <div class="mday grey--text text--darken-3 font-weight-bold">{{ $moment().locale($store.state.locale).format('dddd,') }}</div>
+              <div class="mdatem black--text font-weight-bold">{{ $moment().locale($store.state.locale).format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#666;" >M</span></div>
 
               <div v-if="settings.arabic_hijri_calendar == 1" class="mdateh-arb black--text font-weight-bold">
                 {{ $moment().add(hijriTurnOver, 'minutes').locale('ar_SA').format('dddd,') }}
@@ -46,12 +47,12 @@
               </div>    
 
               <div v-else class="mdateh-ind  black--text font-weight-bold">
-                {{ $hijri().add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#666;">H</span>
+                {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#666;">H</span>
               </div>    
 
           </v-flex>
           <v-flex xs3 offset-xs9 class="cpr-1 opc7">
-            <div class="clock red--text font-weight-bold white-shadow2">{{ clock.format('HH:mm:ss') }}</div>
+            <div class="clock red--text font-weight-bold white-shadow2">{{ clock.locale($store.state.locale).format('HH:mm:ss') }}</div>
           </v-flex>
         </v-layout>  
 
@@ -63,8 +64,8 @@
         <v-flex xs5 offset-xs2>
           <div class="greyopc display-timer font-weight-bold white-shadow1" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1">
             <span class="display-timer-arb " v-if="settings.arabic_next_schedule == 1">{{ nextSchedule.ar_name }}</span>
-            <span v-else class="display-timer-ind">{{ nextSchedule.name }}</span>
-            <span class="display-timer-counter">- {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
+            <span v-else class="display-timer-ind">{{ $t(nextSchedule.name) }}</span>
+            <span class="display-timer-counter"> - {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
             </span>
           </div>
         </v-flex>        
@@ -73,12 +74,12 @@
           <div class="greyopc display-holiday" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
             <div class="white-shadow1 font-weight-bold" v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') == 0">
               <span class="holiday-count " >Hari ini: </span>
-              <span class="holiday-name green--text text--darken-4" >{{ toDate.name }}</span>
+              <span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }}</span>
             </div>
             
             <div  class="white-shadow1 font-weight-bold">
-              <span class="holiday-name green--text text--darken-4" >{{ toDate.name }} </span>
-              <span class="holiday-count " > {{ toDate.dateh.to($hijri().add(settings.hijri_correction, 'days'), true) }} lagi</span>  
+              <span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }} </span>
+              <span class="holiday-count " >{{ remainingHoliday }}</span>  
             </div>
           </div>
         </v-flex>       
@@ -135,33 +136,15 @@ import { createSimpleTransition } from 'vuetify/es5/util/helpers'
     
     data(){
       return{
-        test:true,
-        tr: 'slideleft',        
-        backgroundAnimation: 'simple',
-        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
-        fluxOptions: { autoplay: true, delay: this.settings.carousel_time * 1000 },
+        test:false,
+        showFlux: false,
         
-        // allFluxTransitions: {
-        //   transitionWaterfall: Transitions.transitionWaterfall,
-        //   transitionFade: Transitions.transitionFade,
-        //   transitionSwipe: Transitions.transitionSwipe,
-        //   transitionBlocks1: Transitions.transitionBlocks1,
-        //   transitionSlide: Transitions.transitionSlide,
-        //   transitionKenburn: Transitions.transitionKenburn,
-        //   transitionZip: Transitions.transitionZip,
-        //   transitionBlinds2d: Transitions.transitionBlinds2d,
-        //   transitionCamera: Transitions.transitionCamera,
-        //   transitionWarp: Transitions.transitionWarp,
-        //   transitionRound2: Transitions.transitionRound2,
-        //   transitionBlocks2: Transitions.transitionBlocks2,
-        //   transitionExplode: Transitions.transitionExplode
-        // },
-        slideFluxTransitions: {
-          transitionSlide: Transitions.transitionSlide
-        },
-        fadeFluxTransitions: {
-          transitionFade: Transitions.transitionFade
-        },
+        
+        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
+        fluxOptions: {},
+        
+        backgroundTransition:{},
+
         fluxTransitionOptions:{
           transitionWaterfall:{ tileDuration:1800,tileDelay: 240 },
           transitionFade: { totalDuration: 2000 },
@@ -182,6 +165,8 @@ import { createSimpleTransition } from 'vuetify/es5/util/helpers'
 
     mounted(){
       this.startTicker = true
+      this.setFlux()
+      this.startFlux()
     },
 
     computed:{
@@ -194,9 +179,116 @@ import { createSimpleTransition } from 'vuetify/es5/util/helpers'
         }        
       },
 
-      backgroundTransition(){
+      prevSchedule(){
+        let p = this.schedule.filter(item=> this.$moment(item.time.date).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
+        return p[p.length-1]
+      },
+
+      nextSchedule(){
+        let n = this.schedule.filter(item=>this.$moment(item.time.date).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
+          return n[0]
+      },
+
+      tickers(){
+      //   if(this.license_not_match === true){
+      //     return [
+      //       {text: 'Lisensi alat tidak sesuai dengan nomor seri.'},
+      //       {text: 'Silakan hubungi reseller/customer service'},
+      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
+      //     ]
+      //   }
+
+      //   if(this.no_license === true){
+      //     return [
+      //       {text: 'Tidak ditemukan kode lisensi pada mesin ini.'},
+      //       {text: 'Silakan hubungi reseller/customer service'},
+      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
+      //     ]
+      //   }
+
+      //   var nk = this.nextKhotbah
+      //   var t = this.fetched_tickers
+
+      //   if(nk){
+      //     if (nk.khotib.city != ""){
+      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
+      //     } else {
+      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name
+      //     }
+      //   }
+    
+      //   if(nk.ticker == 1)  {
+      //     t = t.concat({text: ktext})
+      //   }
+    
+      //   if ( this.$store.state.license == 'demo'){                
+      //     t = t.concat({ text:'Demo jam sholat masjid menggunakan TV' })                            
+      //   }
+
+      // return t
+
+      var _0x7498=["license_not_match","Lisensi alat tidak sesuai dengan nomor seri.","Silakan hubungi reseller/customer service","WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com","no_license","Tidak ditemukan kode lisensi pada mesin ini.","nextKhotbah","fetched_tickers","city","khotib","","Khotib Jumat (","DD-MMM-YY","format","locale","state","$store","date","): ","name"," dari ",".","ticker","concat","license","demo","Demo jam sholat masjid menggunakan TV"];if(this[_0x7498[0]]=== true){return [{text:_0x7498[1]},{text:_0x7498[2]},{text:_0x7498[3]}]};if(this[_0x7498[4]]=== true){return [{text:_0x7498[5]},{text:_0x7498[2]},{text:_0x7498[3]}]};var nk=this[_0x7498[6]];var t=this[_0x7498[7]];if(nk){if(nk[_0x7498[9]][_0x7498[8]]!= _0x7498[10]){var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]+ _0x7498[20]+ nk[_0x7498[9]][_0x7498[8]]+ _0x7498[21]}else {var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]}};if(nk[_0x7498[22]]== 1){t= t[_0x7498[23]]({text:ktext})};if(this[_0x7498[16]][_0x7498[15]][_0x7498[24]]== _0x7498[25]){t= t[_0x7498[23]]({text:_0x7498[26]})};return t
+
+      },      
+
+      progressSize(){
+        return window.innerHeight * 0.7
+      },
+
+      progressWidth(){
+        return window.innerHeight * 0.16
+      },
+
+      filteredSchedule(){        
+          let k = this.schedule.filter(item => {
+            return this.$moment(item.time.date).format('DD') == this.$moment().format('DD')
+            })
+          return k
+      },  
+
+      toDate(){
+
+        var td = this.holidays.map(d=>{
+            return {name: d.name, dateh: this.$hijri(d.dateh, 'iYYYY-iMM-iDD').subtract(this.hijriTurnOver, 'minutes')}
+        })
+
+        .filter(c => {
+          return c.dateh.isSameOrAfter(this.$hijri().add(this.settings.hijri_correction * 1440, 'minutes').subtract(1, 'days'))
+        })
+
+        .sort((a,b) => { 
+          a.dateh.diff(b.dateh)
+        })[0]
+
+        return td            
+      },
+
+      hijriTurnOver(){
+        if(this.schedule != ''){
+          var maghrib = this.$moment(this.schedule[5].time.date).locale(this.$store.state.locale).format('HH:mm')
+          return  1440 - (parseInt((maghrib.split(':')[0] * 60)) + parseInt(maghrib.split(':')[1]))
+        }
+      },
+
+      remainingHoliday(){
+        return this.toDate.dateh.locale(this.$store.state.locale).from(this.$hijri().add(this.settings.hijri_correction, 'days'))        
+      }    
+    },
+
+    methods:{
+      startFlux(){
+        this.showFlux = true
+      },
+
+      stopFlux(){
+        this.showFlux = false
+      },
+
+      setFlux(){
+        this.fluxOptions = { autoplay: true, delay: this.settings.carousel_time * 1000 }        
+        
         if (this.settings.background_transition == 'allFluxTransition'){
-          return  {
+          this.backgroundTransition = {
             transitionWaterfall: Transitions.transitionWaterfall,
             transitionFade: Transitions.transitionFade,
             transitionSwipe: Transitions.transitionSwipe,
@@ -212,92 +304,21 @@ import { createSimpleTransition } from 'vuetify/es5/util/helpers'
             transitionExplode: Transitions.transitionExplode
           }
         }
-      },
 
-      prevSchedule(){
-        let p = this.schedule.filter(item=> this.$moment(item.time.date).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
-        return p[p.length-1]
-      },
-
-      nextSchedule(){
-        let n = this.schedule.filter(item=>this.$moment(item.time.date).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
-          return n[0]
-      },
-
-      tickers(){
-        if(this.license_not_match === true){
-          return [{text: 'Lisensi alat tidak sesuai dengan nomor seri.'},{text: 'Silakan hubungi reseller/customer service'},{text: 'Terakhir Lisensi alat tidak sesuai dengan nomor seri.'}]          
-        }
-
-        if(this.no_license === true){
-          return [{text: 'Tidak ditemukan kode lisensi pada mesin ini.'},{text: 'Silakan hubungi reseller/customer service'}]          
-        }
-
-        var nk = this.nextKhotbah
-        var t = this.fetched_tickers
-
-        if(nk){
-          if (nk.khotib.city != ""){
-            var ktext = "Khotib Jumat ("+this.$moment(nk.date).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
-          } else {
-            var ktext = "Khotib Jumat ("+this.$moment(nk.date).format('DD-MMM-YY')+"): "+nk.khotib.name
+        if (this.settings.background_transition == 'fadeFluxTransition'){
+          this.backgroundTransition = {            
+            transitionFade: Transitions.transitionFade,
           }
         }
-    
-        if(nk.ticker == 1)  {
-          t = t.concat({text: ktext})
-        }
-    
-        if ( this.$store.state.license == 'demo'){                
-          t = t.concat({ text:'Demo jam sholat masjid menggunakan TV' })                            
-        }
 
-      return t
-
-      // var _0xe68e=["license_not_match","Lisensi alat tidak sesuai dengan nomor seri.","Silakan hubungi reseller/customer service","no_license","Tidak ditemukan kode lisensi pada mesin ini.","nextKhotbah","fetched_tickers","city","khotib","","Khotib Jumat (","DD-MMM-YY","format","date","): ","name"," dari ",".","ticker","concat","license","$store.state","demo","Demo jam sholat masjid menggunakan TV"];if(this[_0xe68e[0]]=== true){return [{text:_0xe68e[1]},{text:_0xe68e[2]}]};if(this[_0xe68e[3]]=== true){return [{text:_0xe68e[4]},{text:_0xe68e[2]}]};var nk=this[_0xe68e[5]];var t=this[_0xe68e[6]];if(nk){if(nk[_0xe68e[8]][_0xe68e[7]]!= _0xe68e[9]){var ktext=_0xe68e[10]+ this.$moment(nk[_0xe68e[13]])[_0xe68e[12]](_0xe68e[11])+ _0xe68e[14]+ nk[_0xe68e[8]][_0xe68e[15]]+ _0xe68e[16]+ nk[_0xe68e[8]][_0xe68e[7]]+ _0xe68e[17]}else {var ktext=_0xe68e[10]+ this.$moment(nk[_0xe68e[13]])[_0xe68e[12]](_0xe68e[11])+ _0xe68e[14]+ nk[_0xe68e[8]][_0xe68e[15]]}};if(nk[_0xe68e[18]]== 1){t= t[_0xe68e[19]]({text:ktext})};if(this[_0xe68e[21]][_0xe68e[20]]== _0xe68e[22]){t= t[_0xe68e[19]]({text:_0xe68e[23]})};return t
-
-      },      
-
-      progressSize(){
-        return window.innerHeight * 0.7
+        if (this.settings.background_transition == 'slideFluxTransition'){
+          this.backgroundTransition = {            
+            transitionSlide: Transitions.transitionSlide,
+          }
+        }        
       },
-      progressWidth(){
-        return window.innerHeight * 0.16
-      },
-
-      filteredSchedule(){        
-          let k = this.schedule.filter(item => {
-            return this.$moment(item.time.date).format('DD') == this.$moment().format('DD')
-            })
-          return k
-      },  
-
-        toDate(){
-
-          var td = this.holidays.map(d=>{
-              return {name: d.name, dateh: this.$hijri(d.dateh, 'iYYYY-iMM-iDD').subtract(this.hijriTurnOver, 'minutes')}
-            })
-
-            .filter(c => {
-                  return c.dateh.isSameOrAfter(this.$hijri().add(this.settings.hijri_correction * 1440, 'minutes').subtract(1, 'days'))
-                })
-
-                .sort((a,b) => { 
-                  a.dateh.diff(b.dateh)
-                })[0]
-
-              return td
-            
-        },
-
-      hijriTurnOver(){
-        if(this.schedule != ''){
-              var maghrib = this.$moment(this.schedule[5].time.date).format('HH:mm')
-              return  1440 - (parseInt((maghrib.split(':')[0] * 60)) + parseInt(maghrib.split(':')[1]))
-            }
-      }    
+      
     }
-
 
   }
 </script>

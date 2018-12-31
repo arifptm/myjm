@@ -3,10 +3,19 @@ module.exports = {
     moment: {
       locales: [
         'id',
-        'ar'
+        'ar',
+        'ms',
+        'hi',
+        'en'
       ]
     },
-    cordovaPath: 'src-cordova'
+    cordovaPath: 'src-cordova',
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: 'locales',
+      enableInSFC: false
+    }
   },
 
   baseUrl: ''

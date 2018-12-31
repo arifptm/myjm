@@ -125,7 +125,7 @@
     <v-container fluid fill-height style="position: absolute;top:0;left:0;" v-if="$store.state.license == 'demo'">
       <v-layout align-center justify-center>
         <v-flex xs12 class="text-xs-center">
-          <div class="demo1 font-weight-bold" >Demo Jadwal Sholat Digital</div>          
+          <div class="demo1 font-weight-bold" >{{ $t("Demo Mode") }}</div>          
           <div class="demo2 font-weight-bold white--text">{{ settings.demo_name }}</div>
         </v-flex>
       </v-layout>
@@ -234,7 +234,7 @@
         playingIndex: '',        
       }
     },
- 
+
     created(){
       this.getSettings() 
       this.getClock() 
