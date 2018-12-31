@@ -72,7 +72,8 @@
         
         <v-flex xs5>
           <div class="greyopc display-holiday" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
-            <div class="white-shadow1 font-weight-bold" v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') == 0">
+            <div class="white-shadow1 font-weight-bold" v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') < 0
+            && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') > -86400" >
               <span class="holiday-count " >Hari ini: </span>
               <span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }}</span>
             </div>
@@ -89,7 +90,7 @@
       <v-layout class="black">
         <v-flex xs12>
           
-          <v-card class="blackopc ma-0 cpy-2">              
+          <v-card flat class="blackopc ma-0 cpy-2">              
               <v-carousel row v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" height="6.4vh">
                 <v-carousel-item class="ticker" v-text="ticker.text" v-for="(ticker,i) in tickers" :key="i"
                 :transition="settings.ticker_transition"
@@ -126,8 +127,8 @@
 
 <script >
 
-import { VueFlux, Transitions } from 'vue-flux';
-import { createSimpleTransition } from 'vuetify/es5/util/helpers'
+  import { VueFlux, Transitions } from 'vue-flux';
+  import { createSimpleTransition } from 'vuetify/es5/util/helpers'
 
   export default{
     props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
@@ -319,7 +320,6 @@ import { createSimpleTransition } from 'vuetify/es5/util/helpers'
       },
       
     }
-
   }
 </script>
 

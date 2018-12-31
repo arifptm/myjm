@@ -3,6 +3,7 @@
   <div style="height: 100vh">
     <div v-if="settings.layout_id == 1">
       <Layout01 
+        ref="layout"
         :settings="settings" 
         :clock="clock"
         :timerDisplay="timerDisplay"        
@@ -20,7 +21,7 @@
 
     <div v-if="settings.layout_id == 2">
       <Layout02 
-      	ref="lay02"
+      	ref="layout"
         :settings="settings" 
         :clock="clock"
         :timerDisplay="timerDisplay"        
@@ -38,6 +39,7 @@
 
     <div v-if="settings.layout_id == 3">
       <Layout03 
+        ref="layout"
         :settings="settings" 
         :clock="clock"
         :timerDisplay="timerDisplay"        
@@ -55,6 +57,7 @@
 
     <div v-if="settings.layout_id == 4">
       <Layout04 
+        ref="layout"
         :settings="settings" 
         :clock="clock"
         :timerDisplay="timerDisplay"        
@@ -72,6 +75,7 @@
 
     <div v-if="settings.layout_id == 5">
       <Layout05 
+        
         :settings="settings" 
         :clock="clock"
         :timerDisplay="timerDisplay"        
@@ -417,55 +421,48 @@
 
       checkSettings(){
         this.axios.get('/f/check-settings')
-        .then(res=>{          
-          var code = res.data
-          // console.log(code)
-          if (code != 0){            
+        .then(res=>{    
+
+          if (res.data != 0){            
             this.axios.put("/f/bot/1", { code: 0 })
             .then(res=>{              
-              this.getSettings(code)              
+              this.reloadSettings()
             })
           }
         })
       },
 
-      getSettings(code = 0){      	
-      	
+
+      getSettings(){
         this.axios.get('/f/settings')
         .then(res=>{   
           this.settings = res.data
           this.axios.get('/set-audio-out/'+res.data.audio_output)
           this.$store.commit('locale', res.data.locale)
           this.$i18n.locale = this.$store.state.locale
-
-          if (code != 0){    
-          	this.$refs.lay02.stopFlux()      	
-          	this.init()
-          	this.axios.get('/f/settings')
-          	.then(res=>{
-          		this.$refs.lay02.setFlux()
-         			this.$refs.lay02.startFlux()	
-         			this.$swal({
-	              type: 'success', showConfirmButton: false, timer:  2500 ,
-	              title: '<span style="font-family:Roboto">Update Pengaturan...SUKSES!.</span>'
-	            })
-          	})
-        		
-							//window.location.href = '/index.html';            
-	          
-	        }
-          
         })
-      }, 
+      },
 
-      // getMurottal(qid,sid){
-      //   this.axios.get('/f/murottal/'+qid+'/'+sid)
-      //   .then(res=>{
-      //     this.murottal = res.data
+      reloadSettings(){ 
+        this.$refs.layout.stopFlux()
+        this.axios.get('/f/settings')
+        .then(res=>{             
+          this.init()
+          this.settings = res.data
+          this.axios.get('/set-audio-out/'+res.data.audio_output)
+          this.$store.commit('locale', res.data.locale)
+          this.$i18n.locale = this.$store.state.locale          
+          
+      		this.$refs.layout.setFlux()
+     			this.$refs.layout.startFlux()	
 
-      //   })
-      // },
-
+     			this.$swal({
+            type: 'success', showConfirmButton: false, timer:  2500,
+            title: '<span style="font-family:Roboto">Update Pengaturan...SUKSES!.</span>'
+          })
+      	})
+      },
+       
       getBg(){
         this.axios.get('/f/backgrounds')
         .then(res=>{

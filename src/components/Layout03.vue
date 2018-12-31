@@ -1,68 +1,85 @@
 <template>	
 	<v-container fluid text-xs-center class="pa-0">
-		<v-layout row wrap class="topbar px-0" style="background:url('./static/images/topbg.jpg') top center no-repeat; width:100%;background-size:100%;height:18vh;">
-			
-			<v-flex xs10 offset-xs1 class="cpt-2">
-				<div :class="settings.mos_font+ ' mosname yellow--text text--lighten-4 ma-0'" v-html="settings.mos_name"></div>
-				<span class="mosaddress white--text cpb-3 ma-0 font-weight-bold" v-html="settings.mos_address"></span>
-				<span class="mosaddress font-weight-bold yellow--text text--lighten-3" v-if="settings.mos_contact" v-html="settings.mos_contact"></span>
+		
+		<v-layout row wrap class="topbar px-0" :style="`background:url('`+$store.state.baseUrl+`/static/images/topbg.jpg') top center no-repeat; width:100%;background-size:100%;height:20vh;`">			
+			<v-flex xs10 offset-xs1>
+		    <v-container fluid fill-height style="position: absolute;top:0;left:0;padding: 0px;margin:0px;" >
+		      <v-layout align-center justify-center>
+		        <v-flex xs12 class="text-xs-center cpb-2">
+		          <div :class="settings.mos_font+ ' mosname yellow--text text--lighten-4 ma-0 black-shadow2'" v-html="settings.mos_name"></div>
+						<span class="mosaddress white--text cpb-3 ma-0 font-weight-bold" v-html="settings.mos_address"></span>
+						<span class="moscontact font-weight-bold yellow--text text--lighten-3" v-if="settings.mos_contact" v-html="settings.mos_contact"></span>
+		        </v-flex>
+		      </v-layout>
+		    </v-container>				
 			</v-flex>
-
 		</v-layout>
 		
-		<v-layout row wrap class="pa-0 ma-0" style="width:100%;position: absolute;top:18vh;height: 65vh">
+		<v-layout row wrap class="pa-0 ma-0" style="width:100%;position: absolute;top:20vh;height: 61vh">
 
-				<v-flex xs8 class="cpy-1 pl-0 cpr-1">
-					<v-carousel  v-if="backgrounds.length > 0" hide-controls hide-delimiters :interval="settings.carousel_time * 1000" style="height:100%;">
-	      				<v-carousel-item v-for="(background,i) in backgrounds" :key="i" :src="$store.state.baseUrl+'/images/'+background.image" transition="fader">        
-	      				</v-carousel-item>
-	    			</v-carousel>
+				<v-flex xs8 class="cmy-1 pl-0 cpr-1">
+					<v-img v-if="backgroundSlides ==''" :src="$store.state.baseUrl+'/static/images/jbbg.jpg'" ></v-img>
+
+          <vue-flux style="z-index:0;" v-if="showFlux === true && backgroundSlides !=''"
+            :options="fluxOptions"
+            :images="backgroundSlides"
+            :transitions="backgroundTransition" 
+            :transitionOptions="fluxTransitionOptions"   
+            ref="slider"         
+          ></vue-flux> 
+
 				</v-flex>
 
-				<v-flex xs4 class="cpy-1 cpx-0">
-					<v-card color="orange darken-2" flat height="100%">
-						<v-layout row wrap class="pa-0 ma-0">
-							
-							<v-flex xs5 class="cpy-1 cpx-1">
+				<v-flex xs4 class="cmt-1 cmb-0 cpx-0">
+					
+						<v-layout row wrap class="pa-0 ma-0 orange darken-2">	
+
+							<v-flex xs5 class="cpt-1 cpx-1">
 								<v-card height= "9.5vh">
-									<div class="mday">{{ $moment().format('dddd') }}</div>	  
+									<div class="mday">{{ $moment().locale(this.$store.state.locale).format('dddd') }}</div>	  
 								</v-card>
 							</v-flex>
 
-							<v-flex xs7 class="cpy-1 cpr-1">
+							<v-flex xs7 class="cpt-1 cpr-1">
 								<v-card height= "9.5vh">
-									<div class="clock red--text"><b>{{ clock.format('HH:mm:ss') }}</b></div>	  
+									<div class="clock red--text"><b>{{ clock.locale(this.$store.state.locale).format('HH:mm:ss') }}</b></div>	  
 								</v-card>
 							</v-flex>
 
-							<v-flex xs12 class="cpx-1 cpb-1">
-								<v-card height= "14vh">
-									<div class="mdatem blue--text font-weight-bold text--darken-3">{{ $moment().format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#aaf;" >M</span></div>
+							<v-flex xs12 class="cmx-1 cpt-1">
+								<v-card height= "15vh">
+									<div class="mdatem blue--text font-weight-bold text--darken-3">{{ $moment().locale(this.$store.state.locale).format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#4386d1;" >M</span></div>
 									<v-divider class="blue lighten-5 "></v-divider>
 									<div v-if="settings.arabic_hijri_calendar == 1" class="mdateharb  blue--text text--darken-3 font-weight-bold">
 									{{ $hijri().locale('ar-SA').format('dddd,') }}
 									{{ $hijri().locale('ar-SA').add(settings.hijri_correction, 'days').format('iDD  iMMM  iYYYY') }}
 									</div>
 
-									<div v-else class="mdateh blue--text text--darken-3 font-weight-bold">{{ $hijri().add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#aaf;" >H</span></div>
+									<div v-else class="mdateh blue--text text--darken-3 font-weight-bold">{{ $hijri().locale(this.$store.state.locale).add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#4386d1;" >H</span></div>
 								</v-card>
 							</v-flex>
 
-							<v-flex xs12 class="cpx-1">
-								<v-card color="black" height="35.5vh" class="cpa-1">
-									<v-carousel v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" class="ticker-container">
-										<v-carousel-item
-										v-for="(ticker,i) in tickers"
-										:key="i"
-										transition="slideup"										
-										v-text="ticker.text"
-										></v-carousel-item>
-									</v-carousel>
+							<v-flex xs12 class="cpa-1">
+								<v-card color="black" height="33vh" class="" flat>
+									<v-container fluid fill-height style="position: absolute;top:0;left:0;padding: 0px;margin:0px;" >
+      							<v-layout align-center justify-center>
+        							<v-flex xs12 class="text-xs-center">
+    										<v-carousel v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" class="ticker-container" height="auto">
+													<v-carousel-item
+														v-for="(ticker,i) in tickers" :key="i"
+														:transition="settings.ticker_transition"
+														class="ticker"
+														v-text="ticker.text"
+													></v-carousel-item>
+												</v-carousel>
+        							</v-flex>
+      							</v-layout>
+    							</v-container>
 								</v-card>
 							</v-flex>
+
 						</v-layout>
-
-					</v-card>
+					
 				</v-flex>
 
 			</v-layout>
@@ -70,36 +87,51 @@
 
 
 		<div class="bottombar">
-			<v-layout row wrap v-if="timerDisplay === true ">
-				
-				<v-flex xs4 class="cpb-1" v-if="toDate">
-					<v-card class="whiteopc" flat v-if="settings.holiday != 0 && toDate.dateh.diff($hijri(), 'days') < settings.holiday">
-						<v-card-text class="px-0">
-							<div class="display-holiday"><span class="black--text display-timer">{{ toDate.name }}</span> <span class="font-weight-bold red--text text--darken-4">{{ toDate.dateh.fromNow(true) }} lagi</span></div>
-						</v-card-text>
-					</v-card>            
-				</v-flex>
 
-				<v-flex xs4 class="cpb-1 cpr-1">
-					<v-card class="greyopc " flat v-if="generatedTimer && nextSchedule && settings.show_next_schedule == 1">
-						<v-card-text>
-							<div class="display-timer">
-								<span class="display-timer-arb" v-if="settings.arabic_next_schedule == 1">{{ nextSchedule.ar_name }}</span>
-								<span v-else>{{ nextSchedule.name }}</span>
-							 - {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}</b></div>
-						</v-card-text>
-					</v-card>            
-				</v-flex>
-			</v-layout>          
+          	
+		          <v-layout row wrap  >
+								<v-flex xs4 class="" v-if="toDate">
+									<div class="whiteopc display-holiday white-shadow1 font-weight-bold" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
+										<div v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') < 0
+            					&& toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') > -86400">
+											<span class="holiday-count green--text text--darken-4" >Hari ini: </span>
+											<span class="holiday-name black--text" > {{ $t(toDate.name) }}</span>
+										</div>
+										
+										<div v-else>
+											<span class="holiday-name" >{{ $t(toDate.name) }} </span>
+											<span class="holiday-count green--text text--darken-4" >{{ remainingHoliday }}</span>							
+										</div>
+									</div>
+								</v-flex>
 
-			<v-layout row wrap class="orange darken-2 cpy-1">
+								<v-flex xs4 class="cpr-1">
+									<div class="greyopc display-timer white-shadow1 font-weight-bold" v-if="generatedTimer && nextSchedule && settings.show_next_schedule == 1">
+										<div class="display-timer-arb" v-if="settings.arabic_next_schedule == 1">{{ nextSchedule.ar_name }}</div>
+										<div class="display-timer-ind" v-else>{{ $t(nextSchedule.name) }}
+											<span class="display-timer-counter">
+									      - {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
+									 		</span>
+										</div>
+									</div>
+								</v-flex>
+		            
+		          </v-layout>
+		        
+
+
+
+
+
+
+			<v-layout row wrap class="orange darken-2 cpy-1 cmt-1">
 				<v-flex xs2 text-xs-center v-for="item, k in filteredSchedule" :key="item.index">
 					<v-card flat class="opc0 cpx-1">
 						<div class="sc_name_arb yellow--text" v-if="settings.arabic_sc_name == 1">{{ item.ar_name }}
 						</div>
-						<div v-else class="sc_name yellow--text text--lighten-3" ><b>{{ item.name }}</b></div>	
+						<div v-else class="sc_name yellow--text text--lighten-3" ><b>{{ $t(item.name) }}</b></div>	
 
-						<div class="sc_time blue--text text--darken-4 font-weight-bold">{{ $moment(item.time.date).format('HH:mm') }}</div>
+						<div class="sc_time blue--text text--darken-4 font-weight-bold">{{ $moment(item.time.date).locale($store.state.locale).format('HH:mm') }}</div>
 					</v-card>
 				</v-flex>          				
 			</v-layout>          
@@ -122,84 +154,201 @@
 </template>
 
 <script >
-	export default{
-	props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
+
+  import { VueFlux, Transitions } from 'vue-flux';
+  import { createSimpleTransition } from 'vuetify/es5/util/helpers'
+
+  export default{
+    props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
+
+    components: { VueFlux },
     
     data(){
       return{
-        test:true,
+        test:false,
+        showFlux: false,
+        
+        
         color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
+        fluxOptions: {},
+        
+        backgroundTransition:{},
+
+        fluxTransitionOptions:{
+          transitionWaterfall:{ tileDuration:1800,tileDelay: 240 },
+          transitionFade: { totalDuration: 2000 },
+          transitionSwipe: { totalDuration: 2000 },
+          transitionBlocks1: { tileDuration: 600, tileDelay: 2000 },
+          transitionSlide: { totalDuration: 2000 },
+          transitionKenburn: { totalDuration: 3000 },
+          transitionZip: { tileDuration: 1800, tileDelay: 240 },
+          transitionBlinds2d: { tileDuration: 1600, tileDelay:200 },
+          transitionCamera: { tileDuration: 2000, tileDelay: 400 },
+          transitionWarp: { tileDuration: 1600,tileDelay: 200 },
+          transitionRound2: { tileDuration: 1600, tileDelay:200 },
+          transitionBlocks2: { tileDuration: 2000, tileDelay:200 },
+          transitionExplode: { tileDuration: 1500, tileDelay:500 }
+        },
       }
     },
 
+    mounted(){
+      this.startTicker = true
+      this.setFlux()
+      this.startFlux()
+    },
+
     computed:{
+
+      backgroundSlides(){        
+        if(this.backgrounds.length > 0 ){
+          return this.backgrounds.map(item => this.$store.state.baseUrl+'/images/'+item.image)
+        } else {
+          return []
+        }        
+      },
+
       prevSchedule(){
-            let p = this.schedule.filter(item=> this.$moment(item.time.date).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
-            return p[p.length-1]
-          },
+        let p = this.schedule.filter(item=> this.$moment(item.time.date).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
+        return p[p.length-1]
+      },
 
-          nextSchedule(){
-            let n = this.schedule.filter(item=>this.$moment(item.time.date).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
-              return n[0]
-          },
+      nextSchedule(){
+        let n = this.schedule.filter(item=>this.$moment(item.time.date).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
+          return n[0]
+      },
 
-          tickers(){
-		    if (this.$root.demo === false ){
-	            if(this.no_license === true){
-	              return [{text: 'Tidak ditemukan kode lisensi pada mesin ini.'},{text: 'Silakan hubungi reseller/customer service'}]
-	            } else if(this.license_not_match === true){
-	              return [{text: 'Lisensi alat tidak sesuai dengan nomor seri'},{text: 'Silakan hubungi reseller/customer service'}]      
-	            } else {
-	              var nk = this.nextKhotbah
-	              var t = this.fetched_tickers              
+      tickers(){
+      //   if(this.license_not_match === true){
+      //     return [
+      //       {text: 'Lisensi alat tidak sesuai dengan nomor seri.'},
+      //       {text: 'Silakan hubungi reseller/customer service'},
+      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
+      //     ]
+      //   }
 
-	              if(nk.ticker == 1 && this.$root.license == 'pro') {
-	              	return this.fetched_tickers.concat({text: 'Khotib Jumat ('+this.$moment(nk.date).format('DD/MMM/YY')+'): '+nk.khotib.name+' dari '+nk.khotib.city+'.'})
-	              	} else { return t }
-	            }
-	    	} else {
-      			var nk = this.nextKhotbah
-  				var t = this.fetched_tickers      				
+      //   if(this.no_license === true){
+      //     return [
+      //       {text: 'Tidak ditemukan kode lisensi pada mesin ini.'},
+      //       {text: 'Silakan hubungi reseller/customer service'},
+      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
+      //     ]
+      //   }
 
-  				if(nk.ticker == 1 && this.$root.license == 'pro') {
-  					return this.fetched_tickers.concat({text: 'Khotib Jumat ('+this.$moment(nk.date).format('DD/MMM/YY')+'): '+nk.khotib.name+' dari '+nk.khotib.city+'.'})
-  					} else { return t }
-	      	}
+      //   var nk = this.nextKhotbah
+      //   var t = this.fetched_tickers
 
-          },
+      //   if(nk){
+      //     if (nk.khotib.city != ""){
+      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
+      //     } else {
+      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name
+      //     }
+      //   }
+    
+      //   if(nk.ticker == 1)  {
+      //     t = t.concat({text: ktext})
+      //   }
+    
+      //   if ( this.$store.state.license == 'demo'){                
+      //     t = t.concat({ text:'Demo jam sholat masjid menggunakan TV' })                            
+      //   }
+
+      // return t
+
+      var _0x7498=["license_not_match","Lisensi alat tidak sesuai dengan nomor seri.","Silakan hubungi reseller/customer service","WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com","no_license","Tidak ditemukan kode lisensi pada mesin ini.","nextKhotbah","fetched_tickers","city","khotib","","Khotib Jumat (","DD-MMM-YY","format","locale","state","$store","date","): ","name"," dari ",".","ticker","concat","license","demo","Demo jam sholat masjid menggunakan TV"];if(this[_0x7498[0]]=== true){return [{text:_0x7498[1]},{text:_0x7498[2]},{text:_0x7498[3]}]};if(this[_0x7498[4]]=== true){return [{text:_0x7498[5]},{text:_0x7498[2]},{text:_0x7498[3]}]};var nk=this[_0x7498[6]];var t=this[_0x7498[7]];if(nk){if(nk[_0x7498[9]][_0x7498[8]]!= _0x7498[10]){var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]+ _0x7498[20]+ nk[_0x7498[9]][_0x7498[8]]+ _0x7498[21]}else {var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]}};if(nk[_0x7498[22]]== 1){t= t[_0x7498[23]]({text:ktext})};if(this[_0x7498[16]][_0x7498[15]][_0x7498[24]]== _0x7498[25]){t= t[_0x7498[23]]({text:_0x7498[26]})};return t
+
+      },      
 
       progressSize(){
         return window.innerHeight * 0.7
       },
+
       progressWidth(){
         return window.innerHeight * 0.16
       },
 
-        filteredSchedule(){        
-            let k = this.schedule.filter(item => {
-              return this.$moment(item.time.date).format('DD') == this.$moment().format('DD')
-              })
-            return k
-        },  
-
-        toDate(){
-          if(this.holidays !== 0 && this.settings){
-            var td = this.holidays.map(d=>{
-              return {name: d.name, dateh: this.$hijri(d.dateh, 'iYYYY-iMM-iDD')}
+      filteredSchedule(){        
+          let k = this.schedule.filter(item => {
+            return this.$moment(item.time.date).format('DD') == this.$moment().format('DD')
             })
-            .filter(c => {
-                  return c.dateh.subtract(this.settings.hijri_correction, 'iDays').isAfter(this.$hijri())
-                })
-                .sort((a,b) => { 
-                  a.dateh.diff(b.dateh)
-                })[0]
-              return td
-               }
-            
+          return k
+      },  
+
+      toDate(){
+
+        var td = this.holidays.map(d=>{
+            return {name: d.name, dateh: this.$hijri(d.dateh, 'iYYYY-iMM-iDD').subtract(this.hijriTurnOver, 'minutes')}
+        })
+
+        .filter(c => {
+          return c.dateh.isSameOrAfter(this.$hijri().add(this.settings.hijri_correction * 1440, 'minutes').subtract(1, 'days'))
+        })
+
+        .sort((a,b) => { 
+          a.dateh.diff(b.dateh)
+        })[0]
+
+        return td            
+      },
+
+      hijriTurnOver(){
+        if(this.schedule != ''){
+          var maghrib = this.$moment(this.schedule[5].time.date).locale(this.$store.state.locale).format('HH:mm')
+          return  1440 - (parseInt((maghrib.split(':')[0] * 60)) + parseInt(maghrib.split(':')[1]))
         }
+      },
+
+      remainingHoliday(){
+        return this.toDate.dateh.locale(this.$store.state.locale).from(this.$hijri().add(this.settings.hijri_correction, 'days'))        
+      }    
     },
-		
-	}
+
+    methods:{
+      startFlux(){
+        this.showFlux = true
+      },
+
+      stopFlux(){
+        this.showFlux = false
+      },
+
+      setFlux(){
+        this.fluxOptions = { autoplay: true, delay: this.settings.carousel_time * 1000 }        
+        
+        if (this.settings.background_transition == 'allFluxTransition'){
+          this.backgroundTransition = {
+            transitionWaterfall: Transitions.transitionWaterfall,
+            transitionFade: Transitions.transitionFade,
+            transitionSwipe: Transitions.transitionSwipe,
+            transitionBlocks1: Transitions.transitionBlocks1,
+            transitionSlide: Transitions.transitionSlide,
+            transitionKenburn: Transitions.transitionKenburn,
+            transitionZip: Transitions.transitionZip,
+            transitionBlinds2d: Transitions.transitionBlinds2d,
+            transitionCamera: Transitions.transitionCamera,
+            transitionWarp: Transitions.transitionWarp,
+            transitionRound2: Transitions.transitionRound2,
+            transitionBlocks2: Transitions.transitionBlocks2,
+            transitionExplode: Transitions.transitionExplode
+          }
+        }
+
+        if (this.settings.background_transition == 'fadeFluxTransition'){
+          this.backgroundTransition = {            
+            transitionFade: Transitions.transitionFade,
+          }
+        }
+
+        if (this.settings.background_transition == 'slideFluxTransition'){
+          this.backgroundTransition = {            
+            transitionSlide: Transitions.transitionSlide,
+          }
+        }        
+      },
+      
+    }
+  }
 </script>
 
 <style scoped>
@@ -207,6 +356,7 @@
 .aladin.mosname{ font-family: Aladin; font-size: 7vh; line-height: 8vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
 .eczar.mosname{ font-family: Eczar; font-size: 7vh; line-height: 8vh;font-weight: 500;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
 .roboto.mosname{ font-family: Roboto; font-size: 7vh; line-height: 8vh;font-weight: 500;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
+.oleo.mosname{ font-family: "Oleo Script"; font-size: 6vh; line-height: 7vh;font-weight: 500;}
 
 .topbar{position: absolute;top:0;background: rgba(0,0,0,0.5);width: 100%;}
 .bottombar{position: absolute;bottom:0; width: 100%; }
@@ -215,18 +365,27 @@
 .mdatem{ font-size: 5vh; line-height:7vh}
 .mdateh{ font-size: 4.5vh; line-height:7vh}
 
-.mosaddress {font-size:3.5vh; line-height: 4vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
+.mosaddress {font-size:3.5vh; line-height: 5vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
+.moscontact {font-size:3.5vh; line-height: 4vh;text-shadow: 0px 0px 1vh #000,0px 0px 1vh #000,0px 0px 1vh #000,0px 0px 1vh #000;}
 
 .clock{ font-size: 7.5vh;line-height:9.5vh;}
 
-.display-timer{font-size:5.5vh;line-height:4vh;height: 4vh; font-weight: bold;}
-.display-holiday{font-size:4.5vh;line-height:4vh;height: 4vh;}
+.display-timer, .display-holiday{height:7vh;}
+
+.holiday-name{font-size: 4.5vh;line-height: 7vh;}
+.holiday-count{font-size: 3.5vh;}
+
+.display-timer-arb{ font-family: 'Uthmanic'; font-size:7vh; } /*nextschedule*/
+.display-timer-ind{font-size: 5vh;}
+.display-timer-counter { font-size: 5vh;}
+
+
 
 .v-card > *:first-child:not(.v-btn):not(.v-chip).sc_name{font-size:4.5vh;line-height:7vh; border-radius: 4vh 4vh 0 0; background-color:#4e36ff; border-width: 0.75vh 0.75vh 0 0.75vh;border-color:#FFFFFF;border-style:solid;}
 .v-card > *:last-child:not(.v-btn):not(.v-chip).sc_time{font-size:7.5vh;line-height:8.5vh;border-width:0 0.75vh 0.75vh 0.75vh;border-color:#FFFFFF;border-style:solid;border-radius:0 0 4vh 4vh;background-color:#ebe8fd;}
 
-.ticker-container{line-height:6.5vh;font-size:6vh; color:#fbfde5;height:33.5vh}
-.ticker{color:#fefefe;}
+.ticker-container{ height:31.5vh}
+.ticker{color:#fbfde5;line-height:5.5vh;font-size:5vh;}
 
 .counter-adzan{font-size:22vh; text-shadow:0 0 45px #000000; }
 
@@ -241,19 +400,20 @@
 .blueopc, .blueopc.v-card{background-color: rgba(33, 150, 243, 0.5); text-shadow: 0px 0px 25px #000;}
 .greyopc, .greyopc.v-card{background-color: rgba(155, 155, 155, 0.7);}
 
-.fader-enter-active, .fader-leave-active, .fader-leave-to{transition: 1s ease-out;position: absolute;top: 0;left: 0;}
-.fader-enter, .fader-leave, .fader-leave-to{opacity: 0;}
-
-.slideleft-enter-active, .slideleft-leave-active, .slideleft-leave-to{transition: 0.5s;position: absolute;top: 0;left: 0;}
-.slideleft-leave-to {transform: translate3d(-100%, 0, 0)}
-.slideleft-enter, .slideleft-leave{transform: translate3d(100%, 0, 0); }
-
-.slideup-enter-active, .slideup-leave-active{transition: 0.5s;position: absolute;top: 0;left: 0;} 
+.slideup-enter-active, .slideup-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;} 
 .slideup-leave-to{transform: translate3d(0, -100%,0); opacity: 0;}
 .slideup-enter{transform: translate3d(0, 100%,0); opacity: 0;} 
 
+.slideleft-enter-active, .slideleft-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;}
+.slideleft-leave-to{transform: translate3d(-100%,0,0);}
+.slideleft-enter{transform: translate3d(100%,0,0);}
+
+.fade-enter-active, .fade-leave-active{transition: 1s;}
+.fade-leave-to{opacity: 0;}
+.fade-enter{opacity: 0;}
+
 .v-card > *:first-child:not(.v-btn):not(.v-chip).sc_name_arb{font-size:4.5vh;line-height:7.5vh; padding-top:0.5vh; border-radius: 4vh 4vh 0 0; background-color:#4e36ff; border-width: 0.75vh 0.75vh 0 0.75vh;border-color:#FFFFFF;border-style:solid;font-weight: bold;font-family: 'Arabic';font-size: 9.5vh;}
 .mdateharb {  font-family: 'Arabic';font-size: 7vh; line-height:7vh} /*calendar*/
-.display-timer-arb{ font-family: 'Arabic'; font-size:9.5vh }  /*next pray*/
+
 
 </style>
