@@ -11,6 +11,16 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import store from './store'
 
+// import VueAwesomeSwiper from 'vue-awesome-swiper'
+// import 'swiper/dist/css/swiper.css'
+// Vue.use(VueAwesomeSwiper, {
+// 	autoHeight: true,
+// 	effect: 'flip',
+// 	speed:1500,
+// 	autoplay: {
+//     	delay: 10,
+//   	},	
+// })
 
 import VueCarousel from 'vue-carousel';
 import i18n from './i18n'

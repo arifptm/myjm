@@ -15,7 +15,19 @@
   "Idul Adha": "Idul Adha",
   "Tahun baru": "Tahun baru",
 
-  "Demo Mode": "Mode Demo"
+  "Demo Mode": "Mode Demo",
 
+  "Muharram": "Muharram",
+  "Safar": "Safar",
+  "Rabi' al-Awwal": "Rabiul Awal",
+  "Rabi' al-Thani": "Rabiul Akhir",
+  "Jumada al-Ula": "Jumadil Awal",
+  "Jumada al-Alkhirah": "Jumadil Akhir",
+  "Rajab": "Rajab",
+  "Sha’ban": "Sya’ban",
+  "Ramadhan": "Ramadhan",
+  "Shawwal": "Syawal",
+  "Thul-Qi’dah": "Dzulkaidah",
+  "Thul-Hijjah": "Dzulhijjah"
 }
 

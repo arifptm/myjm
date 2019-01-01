@@ -58,12 +58,14 @@
 						<v-flex xs12 class="text-xs-right cpr-2">
 					 		<div class="mdatem white--text pa-0 ma-0 font-weight-bold">
 					 			{{ $moment().locale($store.state.locale).format('dddd') }}, {{ $moment().locale($store.state.locale).format('DD MMM YYYY') }}<span style="font-size:3vh;color:#ccc;">M</span> / 
-					 				<span v-if="settings.arabic_hijri_calendar == 1" class="mdateharb">
+					 				<span v-if="settings.arabic_hijri_calendar == 1" class="mdateh-arb">
 										{{ $hijri().locale('ar-SA').add(settings.hijri_correction, 'days').format('iDD  iMMM  iYYYY') }}
 									</span>															
-									<span v-else class="mdateh blue--text text--lighten-5 pa-0 ma-0">{{ $hijri().locale($store.state.locale).add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#ccc;" >H
-									</span>
-								</span>
+									<span v-else class="mdateh-ind blue--text text--lighten-5 pa-0 ma-0">
+                    {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD') }}
+                    {{ $t($hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iMMMM')) }}
+                    {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iYYYY') }}<span style="font-size:3vh;color:#ccc;" >H</span>
+								  </span>
 							</div>
 						</v-flex>
 					</v-layout>
@@ -72,17 +74,17 @@
 				<v-layout row wrap class="blackopc" v-if="nextSchedule">
 					<v-flex text-xs-center class="cpx-05" v-for="item, k in filteredSchedule" :key="item.index">
 						<v-card class="cmy-1 teal" style="transform: skewX(-15deg);">
-							<div v-if="settings.arabic_sc_name === 1" class="sc_name white--text">
+							<div v-if="settings.arabic_sc_name === 1" class="sc_name-arb white--text font-weight-bold">
 								<div class="arb">{{ item.ar_name }}</div>
 							</div>
-	          	<div v-else class="sc_name white--text font-weight-bold">{{ $t(item.name) }}</div>
+	          	<div v-else class="sc_name-ind white--text font-weight-bold">{{ $t(item.name) }}</div>
 	          	<div class="sc_time yellow--text text--lighten-2 font-weight-bold">{{  $moment(item.time.date).locale($store.state.locale).format('HH:mm') }}</div>
 	         	</v-card>
 	       	</v-flex>           			
 	    		<v-flex xs2 text-xs-center class="cpx-05" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1 && timerDisplay === true">
 						<v-card class="cmy-1 grey darken-3" style="transform: skewX(-15deg);">
-							<div class="sc_name green--text text--lighten-3" v-if="settings.arabic_next_schedule == 1 ">
-								<div class="arb">{{ nextSchedule.ar_name }}</div>
+							<div class="sc_name-ind green--text text--lighten-3" v-if="settings.arabic_next_schedule == 1 ">
+								<div class="sc_name-arb font-weight-bold">{{ nextSchedule.ar_name }}</div>
 							</div>
           		<div v-else class="sc_name grey--text lighten-2 font-weight-black">{{ $t(nextSchedule.name) }}</div>
           		<div class="sc_time white--text font-weight-bold">{{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}<span style="font-size:4vh;line-height: 2vh">:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}</span>
@@ -93,15 +95,11 @@
 			</v-layout>
   		
 			<div class="bottombar">
-				<v-layout class="green darken-3">
+				<v-layout class="green darken-4">
 					<v-flex xs12>
-						<v-carousel row v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" height="9vh" class="blackopc cpy-2">
-							<v-carousel-item class="ticker green--text text--lighten-4"
-							v-for="(ticker,i) in tickers" :key="i"
-							:transition="settings.ticker_transition"
-							v-text="ticker.text"
-							></v-carousel-item>
-						</v-carousel>						
+            <swiper v-if="showTicker === true" :options="swiperOption" ref="mySwiper" class="green darken-4 ticker-container">
+              <swiper-slide v-for="(ticker,i) in tickers" :key="i" class="ticker blackopc">{{ ticker.text }}</swiper-slide>
+            </swiper>
 					</v-flex>
 				</v-layout>          			
 			</div>
@@ -124,20 +122,26 @@
 <script >
 
   import { VueFlux, Transitions } from 'vue-flux';
-  import { createSimpleTransition } from 'vuetify/es5/util/helpers'
+
+  import 'swiper/dist/css/swiper.css'
+  import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
   export default{
     props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
 
-    components: { VueFlux },
+    components: { VueFlux, swiper, swiperSlide },
     
     data(){
       return{
         test:false,
-        showFlux: false,
-               
-        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
-        fluxOptions: {},        
+        showFlux: false,        
+        showTicker: false,
+        
+        fluxOptions: {},
+        swiperOption: {},
+
+        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],        
+        
         backgroundTransition:{},
 
         fluxTransitionOptions:{
@@ -159,12 +163,17 @@
     },
 
     mounted(){
-      this.startTicker = true
       this.setFlux()
+      this.setTicker()
       this.startFlux()
+      this.startTicker()
     },
 
     computed:{
+
+      swiper() {
+        return this.$refs.mySwiper.swiper
+      },      
 
       backgroundSlides(){        
         if(this.backgrounds.length > 0 ){
@@ -233,12 +242,22 @@
     },
 
     methods:{
-      startFlux(){
-        this.showFlux = true
-      },
+      startTicker(){ this.showTicker = true },
+      stopTicker(){ this.showTicker = false },
+      startFlux(){ this.showFlux = true},      
+      stopFlux(){ this.showFlux = false },
 
-      stopFlux(){
-        this.showFlux = false
+      setTicker(){
+        this.swiperOption = {
+          effect: this.settings.ticker_transition.split(' ')[0],
+          autoHeight: true,
+          direction: this.settings.ticker_transition.split(' ')[1],
+          speed:1500,
+          loop:true,
+          autoplay:{            
+            delay: this.settings.ticker_time * 1000
+          }
+        }        
       },
 
       setFlux(){
@@ -281,17 +300,18 @@
 
 <style scoped>
 
-.aladin.mosname{ font-family: Aladin; font-size: 6vh; line-height: 7vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
-.eczar.mosname{ font-family: 'Eczar'; font-size: 6.5vh; line-height: 7vh;font-weight: 500;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
+.aladin.mosname{ font-family: Aladin; font-size: 6.5vh; line-height: 7vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
+.eczar.mosname{ font-family: 'Eczar'; font-size: 6vh; line-height: 7vh;font-weight: 500;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
 .roboto.mosname{ font-family: Roboto; font-size: 6vh; line-height: 7vh;font-weight: 500;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
-.oleo.mosname{ font-family: "Oleo Script"; font-size: 6vh; line-height: 7vh;font-weight: 500;}
+.oleo.mosname{ font-family: "Oleo Script"; font-size: 6.5vh; line-height: 7vh;font-weight: 500;}
 
 	.topbar{position: absolute;top:0;background: rgba(0,0,0,0.5);width: 100%;}
 	.bottombar{position: absolute;bottom:0; width: 100%; }
 
 	.mday{ font-size: 5vh; line-height:5vh;}
 	.mdatem{ font-size: 4vh; line-height:5vh;padding-bottom: 0.5vh;}
-	.mdateh{ font-size: 4vh; line-height:5vh;}	
+	.mdateh-ind{ font-size: 4vh; line-height:5vh;}	
+  .mdateh-arb {  font-family: 'Uthmanic';font-size: 4.5vh; line-height:5vh;} /*top date*/
 
 	.mosaddress {font-size:3vh; line-height: 4vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
 	.moscontact {font-size:3vh; line-height: 4vh;text-shadow: 0px 0px 2vh #000,0px 0px 1vh #000;}
@@ -299,14 +319,18 @@
 	.clock{ font-size: 9vh;line-height:9vh}
 	
 	.display-timer{font-size:6vh;line-height:4vh;height: 4vh;font-weight: bold}
+
+  .display-timer-arb{ font-family: 'Uthmanic'; font-size:9.5vh } /*nextschedule*/
 	.display-holiday{font-size:4vh;line-height:7vh;height: 7vh;}	
 	.holiday-name {font-size:3.5vh;}
 	.holiday-count{font-size: 3.25vh;}
 	
-	.sc_name{font-size:5vh;line-height:6vh;}
+	.sc_name-ind{font-size:5vh;line-height:6vh;}
+  .sc_name-arb{ font-family: 'Uthmanic'; font-size: 5vh;line-height:5.5vh;padding-top:1vh;} /*sholat-name*/
 	.sc_time{font-size:7vh;line-height:7vh;}
-		
-	.ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;font-size:5.4vh;line-height:5.4vh;}
+
+  .ticker-container {height: 8vh;}
+  .ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;line-height:8vh;font-size:5.4vh;}  
 
 	.counter-adzan{font-size:22vh; text-shadow:0 0 45px #000000; }
 
@@ -320,21 +344,5 @@
 .greenopc, .greenopc.v-card{background-color: rgba(76, 175, 80, 0.5);text-shadow: 0px 0px 25px #000;}
 .blueopc, .blueopc.v-card{background-color: rgba(33, 150, 243, 0.5); text-shadow: 0px 0px 25px #000;}
 .greyopc, .greyopc.v-card{background-color: rgba(155, 155, 155, 0.7);}
-
-.slideup-enter-active, .slideup-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;} 
-.slideup-leave-to{transform: translate3d(0, -100%,0); opacity: 0;}
-.slideup-enter{transform: translate3d(0, 100%,0); opacity: 0;} 
-
-.slideleft-enter-active, .slideleft-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;}
-.slideleft-leave-to{transform: translate3d(-100%,0,0);}
-.slideleft-enter{transform: translate3d(100%,0,0);}
-
-.fade-enter-active, .fade-leave-active{transition: 1s;}
-.fade-leave-to{opacity: 0;}
-.fade-enter{opacity: 0;}
-
-.arb{ font-family: 'Arabic'; font-size: 7.5vh; font-weight: bold;line-height:5.5vh;padding-top:1vh;} /*sholat-name*/
-.display-timer-arb{ font-family: 'Arabic'; font-size:9.5vh } /*nextschedule*/
-.mdateharb {  font-family: 'Arabic';font-size: 6.5vh; line-height:5vh;margin-top: 1vh;} /*top date*/
 
 </style>

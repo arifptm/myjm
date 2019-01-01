@@ -767,6 +767,7 @@
   .cmx-15{margin-left:1.5vh;margin-right:1.5vh;}
   .cmy-05{margin-top:0.5vh;margin-bottom:0.5vh;}
   .cmy-1{margin-top:1vh;margin-bottom:1vh;}
+  .cmy-11{margin-top:1vh;margin-bottom:1.3vh;}
   .cmy-15{margin-top:1.5vh;margin-bottom:1.5vh;}
 
   .cmt-1{margin-top:1vh;}

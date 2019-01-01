@@ -13,84 +13,86 @@
       </v-flex>
     </v-layout>
 
-
 		<v-layout row wrap class="topbar">
 			<v-flex xs3 text-xs-left class="cpt-2 cpl-2 font-weight-bold black-shadow1">
-				<div class="mday blue--text text--lighten-5 pa-0 ma-0">{{ $moment().locale($store.state.locale).format('dddd') }},</div>
-				<div class="mdatem blue--text text--lighten-4">{{ $moment().locale($store.state.locale).format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#eee;" >M</span></div>
-				<v-divider class="blue lighten-5"></v-divider>
 				
+        <div class="mday blue--text text--lighten-5 pa-0 ma-0">{{ $moment().locale($store.state.locale).format('dddd') }},</div>
+				<div class="mdatem blue--text text--lighten-4">{{ $moment().locale($store.state.locale).format('DD MMMM YYYY') }}<span style="font-size:3vh;color:#eee;" >M</span>
+        </div>
+				<v-divider class="blue lighten-5"></v-divider>				
+
 				<div v-if="settings.arabic_hijri_calendar == 1" class="mdateh-arb  blue--text text--lighten-3">
 					{{ $moment().add(hijriTurnOver, 'minutes').locale('ar_SA').format('dddd,') }}
 					{{ $hijri().add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').locale('ar_SA').format('iDD  iMMM  iYYYY') }}
 				</div>
+
 				<div v-else class="mdateh-ind blue--text text--lighten-3 pa-0 ma-0">
-					{{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#eee;">H</span>
+          {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD') }}
+          {{ $t($hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iMMMM')) }}
+          {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iYYYY') }}<span style="font-size:3vh;color:#eee;">H</span>
 				</div>
 
 			</v-flex> 
+
 			<v-flex xs6 class="cpt-1">
 				<div :class="settings.mos_font+ ' mosname yellow--text text--lighten-4 ma-0 black-shadow2'" v-html="settings.mos_name"></div>
 				<span class="mosaddress white--text pb-3 ma-0 font-weight-bold black-shadow2" v-html="settings.mos_address"></span>
 				<span class="mosphone font-weight-bold yellow--text text--lighten-3 black-shadow2" v-if="settings.mos_contact" v-html="settings.mos_contact"></span>
 			</v-flex>
-			<v-flex xs3 text-xs-right class="cpr-2">
-				<div class="clock red--text pa-0 ma-0 black-shadow1"><b>{{ clock.locale($store.state.locale).format('HH:mm:ss') }}</b></div>
+			
+      <v-flex xs3 text-xs-right class="cpr-2">
+				<div class="clock red--text lighten-1 pa-0 ma-0 black-shadow1"><b>{{ clock.locale($store.state.locale).format('HH:mm:ss') }}</b></div>
 			</v-flex>
+
 		</v-layout>
 
 		<div class="bottombar">
 			<v-layout row wrap class="cpx-05">
 
 				<v-flex xs5>
-					<div class="greyopc display-timer white-shadow1 font-weight-bold" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1">
-						<span class="display-timer-arb" v-if="settings.arabic_next_schedule == 1">
-							{{ nextSchedule.ar_name }}
+					<div class="whiteopc display-timer white-shadow1 font-weight-bold" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1">
+						<span v-if="settings.arabic_next_schedule == 1" class="display-timer-arb">
+							{{ nextSchedule.ar_name }} - 
 						</span>
-						<span v-else class="display-timer-ind">{{ $t(nextSchedule.name) }}
-						  <span class="display-timer-counter">
-							- {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
+						<span v-else class="display-timer-ind">{{ $t(nextSchedule.name) }} - </span>
+						  <span class="display-timer-counter green--text text--darken-4">
+                {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
               </span>
-						</span>						
+						
 					</div>
 				</v-flex>
 				
 				<v-flex xs5 offset-xs2>
-					<div class="greyopc display-holiday white-shadow1 font-weight-bold" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
+					<div class="whiteopc display-holiday white-shadow1 font-weight-bold" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
 						<div v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') < 0
             && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') > -86400">
-							<span class="holiday-count " >Hari ini:  </span>
-							<span class="holiday-name green--text text--darken-4" > {{ $t(toDate.name) }}</span>
+							<span class="holiday-count green--text text--darken-4" >Hari ini:  </span>
+							<span class="holiday-name" > {{ $t(toDate.name) }}</span>
 						</div>
 						
 						<div v-else>
-							<span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }} </span>
-							<span class="holiday-count" >{{ remainingHoliday }}</span>							
+							<span class="holiday-name" >{{ $t(toDate.name) }} </span>
+							<span class="holiday-count green--text text--darken-4" >{{ remainingHoliday }}</span>							
 						</div>
 					</div>
 				</v-flex>			
-
 			</v-layout>          
 
 			<v-layout row wrap class="blackopc" v-if="nextSchedule">
 				<v-flex xs2 text-xs-center class="cpx-05" v-for="item, k in filteredSchedule" :key="item.index">
 					<v-card :class="'cmy-1 ' + color[k]" >
 						<div class="sc_name_arb yellow--text black_shadow2 font-weight-bold" v-if="settings.arabic_sc_name == 1">{{ item.ar_name }}</div>
-	            		<div v-else class="sc_name yellow--text black_shadow2 font-weight-bold">{{ $t(item.name) }}</div>
-	            		<div class="sc_time white--text font-weight-medium black_shadow2">{{  $moment(item.time.date).locale($store.state.locale).format('HH:mm') }}</div>
-	          		</v-card>
-	          	</v-flex>           
+              <div v-else class="sc_name yellow--text black_shadow2 font-weight-bold">{{ $t(item.name) }}</div>
+	            <div class="sc_time white--text font-weight-medium black_shadow2">{{  $moment(item.time.date).locale($store.state.locale).format('HH:mm') }}</div>
+	        </v-card>
+        </v-flex>           
 			</v-layout>          
 		
-			<v-layout class="black">
-				<v-flex xs12>
-					<v-card class="blackopc ma-0 cpy-1">						
-            <v-carousel row v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" height="6.4vh">
-              <v-carousel-item class="ticker" v-text="ticker.text" v-for="(ticker,i) in tickers" :key="i"
-              :transition="settings.ticker_transition"
-              ></v-carousel-item>
-            </v-carousel>   						
-					</v-card>
+			<v-layout>
+				<v-flex xs12>					
+          <swiper v-if="showTicker === true" :options="swiperOption" ref="mySwiper" class="black ticker-container">    
+            <swiper-slide v-for="(ticker,i) in tickers" :key="i" class="ticker"><div>{{ ticker.text }}</div></swiper-slide>
+          </swiper>
 				</v-flex>
 			</v-layout>          			
 		</div>
@@ -100,8 +102,8 @@
 				<v-container fill-height class="pa-0">
 					<v-flex xs12 class="text-xs-center">
 						<v-progress-circular :rotate="360" :size="progressSize" :width="progressWidth" :value="100-(generatedTimer.toward.seconds * 1.666666667)" color="orange" >
-			          <div class="counter-adzan font-weight-bold white--text">{{ generatedTimer.toward.seconds }}</div>
-			          </v-progress-circular>  
+              <div class="counter-adzan font-weight-bold white--text">{{ generatedTimer.toward.seconds }}</div>
+            </v-progress-circular>  
 					</v-flex>
 				</v-container>            
 			</div>       
@@ -113,20 +115,25 @@
 <script >
 
   import { VueFlux, Transitions } from 'vue-flux';
-  import { createSimpleTransition } from 'vuetify/es5/util/helpers'
+
+  import 'swiper/dist/css/swiper.css'
+  import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
   export default{
     props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
 
-    components: { VueFlux },
+    components: { VueFlux, swiper, swiperSlide },
     
     data(){
       return{
         test:false,
         showFlux: false,        
+        showTicker: false,
         
-        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
         fluxOptions: {},
+        swiperOption: {},
+
+        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],        
         
         backgroundTransition:{},
 
@@ -149,12 +156,16 @@
     },
 
     mounted(){
-      this.startTicker = true
       this.setFlux()
+      this.setTicker()
       this.startFlux()
+      this.startTicker()
     },
 
     computed:{
+      swiper() {
+        return this.$refs.mySwiper.swiper
+      },
 
       backgroundSlides(){        
         if(this.backgrounds.length > 0 ){
@@ -261,16 +272,26 @@
     },
 
     methods:{
-      startFlux(){
-        this.showFlux = true
-      },
+      startTicker(){ this.showTicker = true },
+      stopTicker(){ this.showTicker = false },
+      startFlux(){ this.showFlux = true},      
+      stopFlux(){ this.showFlux = false },
 
-      stopFlux(){
-        this.showFlux = false
+      setTicker(){
+        this.swiperOption = {
+          effect: this.settings.ticker_transition.split(' ')[0],
+          autoHeight: true,
+          direction: this.settings.ticker_transition.split(' ')[1],
+          speed:1500,
+          loop:true,
+          autoplay:{            
+            delay: this.settings.ticker_time * 1000
+          }
+        }        
       },
 
       setFlux(){
-        this.fluxOptions = { autoplay: true, delay: this.settings.carousel_time * 1000 }        
+        this.fluxOptions = { autoplay: true, delay: this.settings.carousel_time * 1000}
         
         if (this.settings.background_transition == 'allFluxTransition'){
           this.backgroundTransition = {
@@ -318,8 +339,8 @@
 .mdateh-arb {  font-family: 'Uthmanic';font-size: 4vh; line-height:5vh;margin-top: 1vh;} /*top date*/
 
 .aladin.mosname{ font-family: Aladin; font-size: 8vh; line-height: 8vh;}
-.eczar.mosname{ font-family: 'Eczar'; font-size: 7.5vh; line-height: 8vh;font-weight: 500;}
-.roboto.mosname{ font-family: Roboto; font-size: 7vh; line-height: 8vh;font-weight: 700;}
+.eczar.mosname{ font-family: 'Eczar'; font-size: 6.5vh; line-height: 8vh;font-weight: 500;}
+.roboto.mosname{ font-family: Roboto; font-size: 6.75vh; line-height: 8vh;font-weight: 700;}
 .oleo.mosname{ font-family: "Oleo Script"; font-size: 7vh; line-height: 8vh;font-weight: 500;}
 .mosaddress {font-size:3.5vh; line-height: 4.75vh;}
 .mosphone {font-size:3.5vh; line-height: 4.75vh;}
@@ -327,12 +348,12 @@
 
 	.clock{ font-size: 10vh;line-height:19.5vh;}
 	
-	.display-timer{height:9vh;}
-	.display-timer-arb{ font-family: 'Uthmanic'; font-size:7vh } /*nextschedule*/
-	.display-timer-ind{font-size: 5.5vh;}
-	.display-timer-counter{font-size: 6vh;}
+	.display-timer{height:8vh;}
+	.display-timer-arb{ font-family: 'Uthmanic'; font-size:7vh; line-height: 7vh;} /*nextschedule*/
+	.display-timer-ind{font-size: 5.5vh;line-height: 8vh;}
+	.display-timer-counter{font-size: 6vh;line-height: 8vh;}
 
-	.display-holiday{height:9vh;}
+	.display-holiday{height:8vh;}
 	.holiday-name{font-size: 5.5vh;}
 	.holiday-count{font-size: 5vh;}
 	
@@ -340,8 +361,8 @@
 	.sc_name_arb{ font-family: 'Uthmanic'; font-size: 6.5vh;line-height:6vh;padding-top:0.5vh;} /*sholat-name*/
 	.sc_time{font-size:9vh;line-height:9vh;}
 	
-	
-	.ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;font-size:5.4vh;line-height:6.4vh;}
+	.ticker-container {height: 8vh;}
+	.ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;font-size:5.4vh;line-height:8vh;}
 
 	.counter-adzan{font-size:22vh; text-shadow:0 0 45px #000000; }
 
@@ -355,17 +376,5 @@
 .greenopc, .greenopc.v-card{background-color: rgba(76, 175, 80, 0.5);text-shadow: 0px 0px 25px #000;}
 .blueopc, .blueopc.v-card{background-color: rgba(33, 150, 243, 0.5); text-shadow: 0px 0px 25px #000;}
 .greyopc, .greyopc.v-card{background-color: rgba(155, 155, 155, 0.7);}
-
-.slideup-enter-active, .slideup-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;} 
-.slideup-leave-to{transform: translate3d(0, -100%,0); opacity: 0;}
-.slideup-enter{transform: translate3d(0, 100%,0); opacity: 0;} 
-
-.slideleft-enter-active, .slideleft-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;}
-.slideleft-leave-to{transform: translate3d(-100%,0,0);}
-.slideleft-enter{transform: translate3d(100%,0,0);}
-
-.fade-enter-active, .fade-leave-active{transition: 1s;}
-.fade-leave-to{opacity: 0;}
-.fade-enter{opacity: 0;}
 
 </style>

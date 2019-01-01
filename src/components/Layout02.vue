@@ -3,21 +3,19 @@
   
     <v-layout row wrap>
       <v-flex xs12>        
-          <v-img v-if="backgroundSlides ==''" :src="$store.state.baseUrl+'/static/images/jbbg.jpg'" ></v-img>
-
-          <vue-flux style="z-index:0;" v-if="showFlux === true && backgroundSlides !=''"
-            :options="fluxOptions"
-            :images="backgroundSlides"
-            :transitions="backgroundTransition" 
-            :transitionOptions="fluxTransitionOptions"   
-            ref="slider"         
-          ></vue-flux> 
-
+        <v-img v-if="backgroundSlides ==''" :src="$store.state.baseUrl+'/static/images/jbbg.jpg'" ></v-img>
+        <vue-flux style="z-index:0;" v-if="showFlux === true && backgroundSlides !=''"
+          :options="fluxOptions"
+          :images="backgroundSlides"
+          :transitions="backgroundTransition" 
+          :transitionOptions="fluxTransitionOptions"   
+          ref="slider"
+        ></vue-flux> 
       </v-flex>     
     </v-layout>  
 
     <v-layout row class="abs-top-left">
-        <v-flex xs2 class="text-xs-center blackopc cpx-1 cpt-1">            
+        <v-flex xs2 class="text-xs-center blackopc cpx-1 cpt-0">            
           <v-card :class="'cmy-1 ' + color[k]" v-for="item, k in filteredSchedule" :key="item.index">
             <div class="sc_name_arb yellow--text" v-if="settings.arabic_sc_name == 1 ">{{ item.ar_name }}</div>
             <div class="sc_name yellow--text" v-else><b>{{ $t(item.name) }} </b></div>
@@ -47,7 +45,9 @@
               </div>    
 
               <div v-else class="mdateh-ind  black--text font-weight-bold">
-                {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD iMMMM iYYYY') }}<span style="font-size:3vh;color:#666;">H</span>
+                {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iDD') }}
+                {{ $t($hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iMMMM')) }}
+                {{ $hijri().locale($store.state.locale).add(hijriTurnOver, 'minutes').add(settings.hijri_correction, 'days').format('iYYYY') }}<span style="font-size:3vh;color:#666;">H</span>
               </div>    
 
           </v-flex>
@@ -61,26 +61,26 @@
 
     <div class="bottombar">
       <v-layout row wrap >
-        <v-flex xs5 offset-xs2>
-          <div class="greyopc display-timer font-weight-bold white-shadow1" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1">
-            <span class="display-timer-arb " v-if="settings.arabic_next_schedule == 1">{{ nextSchedule.ar_name }}</span>
-            <span v-else class="display-timer-ind">{{ $t(nextSchedule.name) }}</span>
-            <span class="display-timer-counter"> - {{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
+        <v-flex xs5 offset-xs2 class="blackopc">
+          <div class="whiteopc display-timer font-weight-bold white-shadow1" v-if="nextSchedule && generatedTimer && settings.show_next_schedule == 1">
+            <span v-if="settings.arabic_next_schedule == 1" class="display-timer-arb " >{{ nextSchedule.ar_name }}</span>
+            <span v-else class="display-timer-ind">{{ $t(nextSchedule.name) }}</span> -
+            <span class="display-timer-counter green--text text--darken-4">{{ ('000' + generatedTimer.toward.hours).slice(-2) }}:{{ ('000'+generatedTimer.toward.minutes).slice(-2) }}:{{ ('000'+generatedTimer.toward.seconds).slice(-2) }}
             </span>
           </div>
         </v-flex>        
         
-        <v-flex xs5>
-          <div class="greyopc display-holiday" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
+        <v-flex xs5 class="blackopc">
+          <div class="whiteopc display-holiday" v-if="toDate && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'days') <= settings.holiday">
             <div class="white-shadow1 font-weight-bold" v-if="toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') < 0
             && toDate.dateh.diff($hijri().add(settings.hijri_correction, 'days'), 'seconds') > -86400" >
-              <span class="holiday-count " >Hari ini: </span>
-              <span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }}</span>
+              <span class="holiday-count green--text text--darken-4" >Hari ini: </span>
+              <span class="holiday-name " >{{ $t(toDate.name) }}</span>
             </div>
             
             <div  class="white-shadow1 font-weight-bold">
-              <span class="holiday-name green--text text--darken-4" >{{ $t(toDate.name) }} </span>
-              <span class="holiday-count " >{{ remainingHoliday }}</span>  
+              <span class="holiday-name " >{{ $t(toDate.name) }} </span>
+              <span class="holiday-count green--text text--darken-4" >{{ remainingHoliday }}</span>  
             </div>
           </div>
         </v-flex>       
@@ -88,24 +88,10 @@
       </v-layout>   
 
       <v-layout class="black">
-        <v-flex xs12>
-          
-          <v-card flat class="blackopc ma-0 cpy-2">              
-              <v-carousel row v-if="tickers.length > 0" hide-controls hide-delimiters :interval="settings.ticker_time * 1000" height="6.4vh">
-                <v-carousel-item class="ticker" v-text="ticker.text" v-for="(ticker,i) in tickers" :key="i"
-                :transition="settings.ticker_transition"
-                ></v-carousel-item>
-              </v-carousel>   
-              
-
-                <!-- <span class="ticker" v-for="(ticker,i) in tickers" :key="i"> {{ ticker.text }} 
-                  <span v-if="i < tickers.length-1">
-                    <v-icon color="yellow" size="6vh">star</v-icon>
-                  </span>  
-                </span> -->
-              
-
-          </v-card>
+        <v-flex xs12>          
+          <swiper v-if="showTicker === true" :options="swiperOption" ref="mySwiper" class="black ticker-container">    
+            <swiper-slide v-for="(ticker,i) in tickers" :key="i" class="ticker">{{ ticker.text }}</swiper-slide>
+          </swiper>
         </v-flex>
       </v-layout>               
     </div>    
@@ -115,8 +101,8 @@
         <v-container fill-height class="pa-0">
           <v-flex xs12 class="text-xs-center" v-if="generatedTimer">
             <v-progress-circular :rotate="360" :size="progressSize" :width="progressWidth" :value="100-(generatedTimer.toward.seconds * 1.666666667)" color="orange" >
-                      <div class="counter-adzan font-weight-bold white--text">{{ generatedTimer.toward.seconds }}</div>
-                  </v-progress-circular>  
+              <div class="counter-adzan font-weight-bold white--text">{{ generatedTimer.toward.seconds }}</div>
+            </v-progress-circular>  
           </v-flex>
         </v-container>            
       </div>       
@@ -128,23 +114,23 @@
 <script >
 
   import { VueFlux, Transitions } from 'vue-flux';
-  import { createSimpleTransition } from 'vuetify/es5/util/helpers'
+  import 'swiper/dist/css/swiper.css'
+  import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
   export default{
     props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
 
-    components: { VueFlux },
+    components: { VueFlux, swiper, swiperSlide },
     
     data(){
       return{
         test:false,
-        showFlux: false,
-        
-        
-        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
+        showFlux: false,        
+        showTicker: false,        
         fluxOptions: {},
-        
+        swiperOption: {},
         backgroundTransition:{},
+        color:['tealopc', 'redopc', 'orangeopc', 'greenopc', 'purpleopc',' blueopc', 'greyopc'],
 
         fluxTransitionOptions:{
           transitionWaterfall:{ tileDuration:1800,tileDelay: 240 },
@@ -165,12 +151,17 @@
     },
 
     mounted(){
-      this.startTicker = true
       this.setFlux()
+      this.setTicker()
       this.startFlux()
+      this.startTicker()
     },
 
     computed:{
+
+      swiper() {
+        return this.$refs.mySwiper.swiper
+      },      
 
       backgroundSlides(){        
         if(this.backgrounds.length > 0 ){
@@ -277,12 +268,22 @@
     },
 
     methods:{
-      startFlux(){
-        this.showFlux = true
-      },
+      startTicker(){ this.showTicker = true },
+      stopTicker(){ this.showTicker = false },
+      startFlux(){ this.showFlux = true},      
+      stopFlux(){ this.showFlux = false },
 
-      stopFlux(){
-        this.showFlux = false
+      setTicker(){
+        this.swiperOption = {
+          effect: this.settings.ticker_transition.split(' ')[0],
+          autoHeight: true,
+          direction: this.settings.ticker_transition.split(' ')[1],
+          speed:1500,
+          loop:true,
+          autoplay:{            
+            delay: this.settings.ticker_time * 1000
+          }
+        }        
       },
 
       setFlux(){
@@ -331,8 +332,8 @@
 .topbar{position: absolute;top:0;background: rgba(0,0,0,0.5);width: 100%;}
 .bottombar{position: absolute;bottom:0; width: 100%; }
 
-.sc_name{font-size:4.5vh;line-height:6vh;}
-.sc_name_arb{ font-family: 'Uthmanic'; font-size: 6vh; font-weight: bold;padding-top:1vh;line-height: 5vh} /*praytime*/
+.sc_name{font-size:4.5vh;line-height:6.5vh;}
+.sc_name_arb{ font-family: 'Uthmanic'; font-size: 6vh; font-weight: bold;line-height: 6.5vh} /*praytime*/
 .sc_time{font-size:7.5vh;line-height:7.75vh;}
 
 .aladin.mosname{ font-family: Aladin; font-size: 8vh; line-height: 8vh;}
@@ -348,7 +349,7 @@
 .mdateh-arb {  font-family: 'Uthmanic';font-size: 4.25vh; line-height:6 vh; margin-bottom:1vh; } /*calendar*/
 .clock{ font-size: 10vh;line-height:12vh;}
   
-.display-timer{height:9vh;}
+.display-timer{height:9vh;margin-bottom: 1vh;}
 .display-timer-arb{ font-family: 'Uthmanic'; font-size:7vh;line-height: 9vh; } /*next pray*/
 .display-timer-ind{font-size: 5.5vh;line-height: 9vh}
 .display-timer-counter{font-size:6vh;line-height: 9vh}
@@ -357,7 +358,8 @@
 .holiday-name{font-size: 5.5vh;line-height: 9vh;}
 .holiday-count{font-size: 5vh;line-height: 9vh;}
 
-.ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;line-height:6.4vh;font-size:5.4vh; position: relative;}
+.ticker-container {height: 8vh;}
+.ticker{ white-space: nowrap; overflow: hidden; color:#fefefe;line-height:8vh;font-size:5.4vh;}
 
 .counter-adzan{font-size:22vh; text-shadow:0 0 45px #000000; }
 
@@ -372,17 +374,4 @@
 .redopc, .redopc.v-card{background-color: rgba(244, 67, 54, 0.5);text-shadow: 0px 0px 25px #000;}
 .greenopc, .greenopc.v-card{background-color: rgba(76, 175, 80, 0.5);text-shadow: 0px 0px 25px #000;}
 .blueopc, .blueopc.v-card{background-color: rgba(33, 150, 243, 0.5); text-shadow: 0px 0px 25px #000;}
-
-.slideup-enter-active, .slideup-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;} 
-.slideup-leave-to{transform: translate3d(0, -100%,0); opacity: 0;}
-.slideup-enter{transform: translate3d(0, 100%,0); opacity: 0;} 
-
-.slideleft-enter-active, .slideleft-leave-active{transition: 0.6s;position: absolute;top: 0;right: 0;}
-.slideleft-leave-to{transform: translate3d(-100%,0,0);}
-.slideleft-enter{transform: translate3d(100%,0,0);}
-
-.fade-enter-active, .fade-leave-active{transition: 1s;}
-.fade-leave-to{opacity: 0;}
-.fade-enter{opacity: 0;}
-
 </style>

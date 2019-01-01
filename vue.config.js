@@ -10,7 +10,7 @@ module.exports = {
       ]
     },
     cordovaPath: 'src-cordova',
-    i18n: {
+    i18n: {      
       locale: 'en',
       fallbackLocale: 'en',
       localeDir: 'locales',
