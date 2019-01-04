@@ -1,8 +1,8 @@
 <template>
 	<v-container fluid text-xs-center class="pa-0">
 
-    <v-layout row wrap>
-      <v-flex xs12>        
+    <v-layout row wrap  v-if="$store.state.jumbotron === false">
+      <v-flex xs12 class="black">        
           <v-img v-if="backgroundSlides ==''" :src="$store.state.baseUrl+'/static/images/jbbg.jpg'" ></v-img>
           <vue-flux style="z-index:0;" v-if="showFlux === true && backgroundSlides !=''"
             :options="fluxOptions"
@@ -88,7 +88,7 @@
         </v-flex>           
 			</v-layout>          
 		
-			<v-layout>
+			<v-layout v-if="$store.state.jumbotron === false">
 				<v-flex xs12>					
           <swiper v-if="showTicker === true" :options="swiperOption" ref="mySwiper" class="black ticker-container">    
             <swiper-slide v-for="(ticker,i) in tickers" :key="i" class="ticker"><div>{{ ticker.text }}</div></swiper-slide>
@@ -120,7 +120,7 @@
   import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
   export default{
-    props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah', 'no_license', 'license_not_match'],   
+    props:['settings', 'clock', 'timerDisplay','generatedTimer','schedule','fetched_tickers', 'toAdzan', 'backgrounds', 'holidays', 'nextKhotbah'],
 
     components: { VueFlux, swiper, swiperSlide },
     
@@ -149,8 +149,7 @@
           transitionCamera: { tileDuration: 2000, tileDelay: 400 },
           transitionWarp: { tileDuration: 1600,tileDelay: 200 },
           transitionRound2: { tileDuration: 1600, tileDelay:200 },
-          transitionBlocks2: { tileDuration: 2000, tileDelay:200 },
-          transitionExplode: { tileDuration: 1500, tileDelay:500 }
+          transitionBlocks2: { tileDuration: 2000, tileDelay:200 },          
         },
       }
     },
@@ -186,44 +185,45 @@
       },
 
       tickers(){
-      //   if(this.license_not_match === true){
-      //     return [
-      //       {text: 'Lisensi alat tidak sesuai dengan nomor seri.'},
-      //       {text: 'Silakan hubungi reseller/customer service'},
-      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
-      //     ]
-      //   }
+        // if(this.$store.state.license_not_match === true){
+        //     return [
+        //       {text: 'Lisensi alat tidak sesuai dengan nomor seri.'},
+        //       {text: 'Silakan hubungi reseller/customer service'},
+        //       {text: 'WhatsApp: 0812.2806.2725 / jasmadigital@gmail.com'}
+        //     ]
+        //   }
 
-      //   if(this.no_license === true){
-      //     return [
-      //       {text: 'Tidak ditemukan kode lisensi pada mesin ini.'},
-      //       {text: 'Silakan hubungi reseller/customer service'},
-      //       {text: 'WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com'}
-      //     ]
-      //   }
+        //   if(this.$store.state.no_license === true){
+        //     return [
+        //       {text: 'Tidak ditemukan kode lisensi pada mesin ini.'},
+        //       {text: 'Silakan hubungi reseller/customer service'},
+        //       {text: 'WhatsApp: 0812.2806.2725 / jasmadigital@gmail.com'}
+        //     ]
+        //   }
 
-      //   var nk = this.nextKhotbah
-      //   var t = this.fetched_tickers
+        //   var nk = this.nextKhotbah
+        //   var t = this.fetched_tickers
 
-      //   if(nk){
-      //     if (nk.khotib.city != ""){
-      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
-      //     } else {
-      //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name
-      //     }
-      //   }
-    
-      //   if(nk.ticker == 1)  {
-      //     t = t.concat({text: ktext})
-      //   }
-    
-      //   if ( this.$store.state.license == 'demo'){                
-      //     t = t.concat({ text:'Demo jam sholat masjid menggunakan TV' })                            
-      //   }
+        //   if(nk){
+        //     if (nk.khotib.city != ""){
+        //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
+        //     } else {
+        //       var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name
+        //     }
+        //   }
+      
+        //   if(nk.ticker == 1)  {
+        //     t = t.concat({text: ktext})
+        //   }
+      
+        //   if ( this.$store.state.license == 'demo'){                
+        //     t = t.concat({ text:'Demo jam sholat masjid menggunakan TV' })                            
+        //   }
 
-      // return t
+        // return t
+      
+        var _0xa265=["license_not_match","state","$store","Lisensi alat tidak sesuai dengan nomor seri.","Silakan hubungi reseller/customer service","WhatsApp: 0812.2806.2725 / jasmadigital@gmail.com","no_license","Tidak ditemukan kode lisensi pada mesin ini.","nextKhotbah","fetched_tickers","city","khotib","","Khotib Jumat (","DD-MMM-YY","format","locale","date","): ","name"," dari ",".","ticker","concat","license","demo","Demo jam sholat masjid menggunakan TV"];if(this[_0xa265[2]][_0xa265[1]][_0xa265[0]]=== true){return [{text:_0xa265[3]},{text:_0xa265[4]},{text:_0xa265[5]}]};if(this[_0xa265[2]][_0xa265[1]][_0xa265[6]]=== true){return [{text:_0xa265[7]},{text:_0xa265[4]},{text:_0xa265[5]}]};var nk=this[_0xa265[8]];var t=this[_0xa265[9]];if(nk){if(nk[_0xa265[11]][_0xa265[10]]!= _0xa265[12]){var ktext=_0xa265[13]+ this.$moment(nk[_0xa265[17]])[_0xa265[16]](this[_0xa265[2]][_0xa265[1]][_0xa265[16]])[_0xa265[15]](_0xa265[14])+ _0xa265[18]+ nk[_0xa265[11]][_0xa265[19]]+ _0xa265[20]+ nk[_0xa265[11]][_0xa265[10]]+ _0xa265[21]}else {var ktext=_0xa265[13]+ this.$moment(nk[_0xa265[17]])[_0xa265[16]](this[_0xa265[2]][_0xa265[1]][_0xa265[16]])[_0xa265[15]](_0xa265[14])+ _0xa265[18]+ nk[_0xa265[11]][_0xa265[19]]}};if(nk[_0xa265[22]]== 1){t= t[_0xa265[23]]({text:ktext})};if(this[_0xa265[2]][_0xa265[1]][_0xa265[24]]== _0xa265[25]){t= t[_0xa265[23]]({text:_0xa265[26]})};return t
 
-      var _0x7498=["license_not_match","Lisensi alat tidak sesuai dengan nomor seri.","Silakan hubungi reseller/customer service","WhatsApp: 0812 2806 2725 / jasmadigital@gmail.com","no_license","Tidak ditemukan kode lisensi pada mesin ini.","nextKhotbah","fetched_tickers","city","khotib","","Khotib Jumat (","DD-MMM-YY","format","locale","state","$store","date","): ","name"," dari ",".","ticker","concat","license","demo","Demo jam sholat masjid menggunakan TV"];if(this[_0x7498[0]]=== true){return [{text:_0x7498[1]},{text:_0x7498[2]},{text:_0x7498[3]}]};if(this[_0x7498[4]]=== true){return [{text:_0x7498[5]},{text:_0x7498[2]},{text:_0x7498[3]}]};var nk=this[_0x7498[6]];var t=this[_0x7498[7]];if(nk){if(nk[_0x7498[9]][_0x7498[8]]!= _0x7498[10]){var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]+ _0x7498[20]+ nk[_0x7498[9]][_0x7498[8]]+ _0x7498[21]}else {var ktext=_0x7498[11]+ this.$moment(nk[_0x7498[17]])[_0x7498[14]](this[_0x7498[16]][_0x7498[15]][_0x7498[14]])[_0x7498[13]](_0x7498[12])+ _0x7498[18]+ nk[_0x7498[9]][_0x7498[19]]}};if(nk[_0x7498[22]]== 1){t= t[_0x7498[23]]({text:ktext})};if(this[_0x7498[16]][_0x7498[15]][_0x7498[24]]== _0x7498[25]){t= t[_0x7498[23]]({text:_0x7498[26]})};return t
 
       },      
 
@@ -293,7 +293,7 @@
       setFlux(){
         this.fluxOptions = { autoplay: true, delay: this.settings.carousel_time * 1000}
         
-        if (this.settings.background_transition == 'allFluxTransition'){
+        if (this.settings.background_transition == 'all'){
           this.backgroundTransition = {
             transitionWaterfall: Transitions.transitionWaterfall,
             transitionFade: Transitions.transitionFade,
@@ -311,13 +311,13 @@
           }
         }
 
-        if (this.settings.background_transition == 'fadeFluxTransition'){
+        if (this.settings.background_transition == 'fade'){
           this.backgroundTransition = {            
             transitionFade: Transitions.transitionFade,
           }
         }
 
-        if (this.settings.background_transition == 'slideFluxTransition'){
+        if (this.settings.background_transition == 'slide'){
           this.backgroundTransition = {            
             transitionSlide: Transitions.transitionSlide,
           }

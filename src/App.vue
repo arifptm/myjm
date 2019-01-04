@@ -14,8 +14,7 @@
         :backgrounds="backgrounds"
         :holidays="holidays"
         :nextKhotbah="nextKhotbah"
-        :no_license="no_license"
-        :license_not_match="license_not_match"
+        
       ></Layout01>      
     </div>    
 
@@ -32,8 +31,7 @@
         :backgrounds="backgrounds"
         :holidays="holidays"
         :nextKhotbah="nextKhotbah"
-        :no_license="no_license"
-        :license_not_match="license_not_match"
+            
       ></Layout02>      
     </div>  
 
@@ -50,8 +48,7 @@
         :backgrounds="backgrounds"
         :holidays="holidays"
         :nextKhotbah="nextKhotbah"
-        :no_license="no_license"
-        :license_not_match="license_not_match"
+              
       ></Layout03>      
     </div>   
 
@@ -68,8 +65,7 @@
         :backgrounds="backgrounds"
         :holidays="holidays"
         :nextKhotbah="nextKhotbah"
-        :no_license="no_license"
-        :license_not_match="license_not_match"
+        
       ></Layout04>      
     </div>   
 
@@ -86,45 +82,42 @@
         :backgrounds="backgrounds"
         :holidays="holidays"
         :nextKhotbah="nextKhotbah"
-        :no_license="no_license"
-        :license_not_match="license_not_match"
+        
       ></Layout05>      
     </div>  
 
-    <transition name="jb-fade">
-      <div v-if="jumbotrons.length > 0 && jumbotron === true ">
-        <v-container fluid fill-height class="absolute pa-0" v-if="$store.state.license == 'pro' || $store.state.license == 'demo' || $store.state.license == 'pcmode'">
-          <v-layout row wrap align-center justify-center class="jumbotron-text-bg" :style="'background: url(\''+$store.state.baseUrl+'/static/images/jbbg.jpg\') center center no-repeat; background-size: cover;'" >
-              
-            <img v-if="jumbotrons[jumbotronShown].text && jumbotrons[jumbotronShown].image" style="width:100%;height:auto;" :src="$store.state.baseUrl+'/images/jumbotrons/'+jumbotrons[jumbotronShown].image" class="opc5"/>
-
-            <img v-if="!jumbotrons[jumbotronShown].text && jumbotrons[jumbotronShown].image" style="width:100%;height:auto;" :src="$store.state.baseUrl+'/images/jumbotrons/'+jumbotrons[jumbotronShown].image"/>
+    <transition name="jb-fade" v-if="jumbotrons.length > 0 && $store.state.jumbotron === true ">      
+      <v-container fluid fill-height class="absolute pa-0" v-if="$store.state.license == 'pro' || $store.state.license == 'demo' || $store.state.license == 'pcmode'">
+        <v-layout row wrap align-center justify-center class="jumbotron-text-bg" :style="'background: url(\''+$store.state.baseUrl+'/static/images/jbbg.jpg\') center center no-repeat; background-size: cover;'" >
             
-            <v-container fluid fill-height class="absolute pa-0" >
+          <img v-if="jumbotrons[jumbotronShown].text && jumbotrons[jumbotronShown].image" style="width:100%;height:auto;" :src="$store.state.baseUrl+'/images/jumbotrons/'+jumbotrons[jumbotronShown].image" class="opc5"/>
+
+          <img v-if="!jumbotrons[jumbotronShown].text && jumbotrons[jumbotronShown].image" style="width:100%;height:auto;" :src="$store.state.baseUrl+'/images/jumbotrons/'+jumbotrons[jumbotronShown].image"/>
+          
+          <v-container fluid fill-height class="absolute pa-0" >
+            <v-layout row wrap align-center justify-center>
+
+            <v-flex xs10>
+              <div class="text-xs-center yellow--text font-weight-medium jumbotron-text cpb-4" v-html="jumbotrons[jumbotronShown].text ">
+              </div>
+            </v-flex>
+
+            <v-flex xs12 class="abs-bottom blackopc">
               <v-layout row wrap align-center justify-center>
-
-              <v-flex xs10>
-                <div class="text-xs-center yellow--text font-weight-medium jumbotron-text cpb-4" v-html="jumbotrons[jumbotronShown].text ">
-                </div>
-              </v-flex>
-
-              <v-flex xs12 class="abs-bottom blackopc">
-                <v-layout row wrap align-center justify-center>
-                  <v-flex xs6>
-                    <div class="jumbotron-clock orange--text px-3"><b>{{ clock.format('HH:mm:ss') }}</b></div>          
-                  </v-flex>
-                  <v-flex xs6 class="text-xs-right orange--text">
-                    <span class="jumbotron-next-name font-weight-bold white--text" v-if="nextSchedule">{{ nextSchedule.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <v-icon color="blue" size="6vh">alarm</v-icon>&nbsp;
-                    <span class="jumbotron-next-time pr-3 " >{{ $moment(nextSchedule.time.date).format('HH:mm') }}</span>
-                  </v-flex>
-                </v-layout>
-              </v-flex> 
-            </v-layout>
-            </v-container>
+                <v-flex xs6>
+                  <div class="jumbotron-clock orange--text px-3"><b>{{ clock.format('HH:mm:ss') }}</b></div>          
+                </v-flex>
+                <v-flex xs6 class="text-xs-right orange--text">
+                  <span class="jumbotron-next-name font-weight-bold white--text" v-if="nextSchedule">{{ nextSchedule.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                  <v-icon color="blue" size="6vh">alarm</v-icon>&nbsp;
+                  <span class="jumbotron-next-time pr-3 " >{{ $moment(nextSchedule.time.date).locale($store.state.locale).format('HH:mm') }}</span>
+                </v-flex>
+              </v-layout>
+            </v-flex> 
           </v-layout>
-        </v-container>            
-      </div>
+          </v-container>
+        </v-layout>
+      </v-container>      
     </transition>
 
 <!-- demo container -->
@@ -219,6 +212,7 @@
         settings:{
           iqomah_bg:'',
           jumbotron_pause:1,
+          locale:'',
         },
         nextKhotbah:{ khotib:{} },
         fetched_tickers:[],
@@ -229,15 +223,12 @@
         timerDisplay:true,
         serial:'',
         strobe: true,        
-        jumbotronShown: 0,
-        jumbotron: false,        
-        rawHolidays:[],        
-        no_license: true,
-        license_not_match: false,
+        jumbotronShown: 0,        
+        rawHolidays:[],
 
-        audioAdzan: new Audio,
-        audioIqomah:new Audio,
-        audioMurottal: new Audio,
+        audioAdzan: new Audio(),
+        audioIqomah:new Audio(),
+        audioMurottal: new Audio(),
         
         playList: [],
         //murottal_file_index: 0,
@@ -248,18 +239,20 @@
 
     created(){             
       this.init()
+      this.getBg()
       this.getSettings()      
-      this.getClock()
+      this.getClock()      
+      this.blink()
     },    
 
     computed: {
       prevSchedule(){
-        let p = this.schedule.filter(item=> this.$moment(item.time.date).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
+        let p = this.schedule.filter(item=> this.$moment(item.time.date).locale(this.$store.state.locale).isBefore() && item.name != 'Syuruq' && item.name != 'Imsak')
         return p[p.length-1]
       },
 
       nextSchedule(){
-        let n = this.schedule.filter(item=>this.$moment(item.time.date).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
+        let n = this.schedule.filter(item=>this.$moment(item.time.date).locale(this.$store.state.locale).isAfter() && item.name != 'Syuruq' && item.name != 'Imsak')
         return n[0]
       },
 
@@ -274,7 +267,7 @@
       counterBg(){
         if(this.prevSchedule){
           if (this.prevSchedule.slug != 'jumat'){
-            return ( this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date))  && this.clock.isSameOrBefore(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause *60) + 9, 'seconds')) ) ? true : false
+            return ( this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale))  && this.clock.isSameOrBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause *60) + 9, 'seconds')) ) ? true : false
           } else {
             return false
           }
@@ -283,20 +276,20 @@
 
       toAdzan(){ 
         if(this.nextSchedule){
-          return (this.clock.isSameOrAfter(this.$moment(this.nextSchedule.time.date).subtract(1, 'minutes')) && this.clock.isBefore(this.$moment(this.nextSchedule.time.date))) ? true : false   
+          return (this.clock.isSameOrAfter(this.$moment(this.nextSchedule.time.date).locale(this.$store.state.locale).subtract(1, 'minutes')) && this.clock.isBefore(this.$moment(this.nextSchedule.time.date).locale(this.$store.state.locale))) ? true : false   
         }
       },
 
       toIqomah(){
         if(this.prevSchedule){   
-          return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date)) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).add(this.prevSchedule.iqomah_pause, 'minutes')) ) ? true : false
+          return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale)) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add(this.prevSchedule.iqomah_pause, 'minutes')) ) ? true : false
         }
       },
 
       goSholat(){
         if(this.prevSchedule){
           if (this.prevSchedule.slug != 'jumat'){
-            return (this.clock.isAfter(this.$moment(this.prevSchedule.time.date).add(this.prevSchedule.iqomah_pause, 'minutes')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause*60) + 9, 'seconds')) ) ? true : false      
+            return (this.clock.isAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add(this.prevSchedule.iqomah_pause, 'minutes')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause*60) + 9, 'seconds')) ) ? true : false      
           } else {
             return false
           }
@@ -307,9 +300,9 @@
         if(this.prevSchedule) {  
           if (this.prevSchedule.slug != 'jumat'){
             if( this.$hijri().iMonth() == 9 && this.prevSchedule.name == 'Isya'){
-              return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause *60) +9, 'seconds')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause * 60 ) + 9 + (this.settings.tarawih_duration * 60) , 'seconds')) ) ? true : false
+              return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause *60) +9, 'seconds')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause * 60 ) + 9 + (this.settings.tarawih_duration * 60) , 'seconds')) ) ? true : false
             } else {
-            return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause *60) +9, 'seconds')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).add((this.prevSchedule.iqomah_pause * 60 ) + 9 + (this.settings.sholat_duration * 60) , 'seconds')) ) ? true : false      
+            return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause *60) +9, 'seconds')) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add((this.prevSchedule.iqomah_pause * 60 ) + 9 + (this.settings.sholat_duration * 60) , 'seconds')) ) ? true : false      
             }
           } else {
             return false
@@ -320,7 +313,7 @@
       jumatNow(){
         if(this.prevSchedule){
           if (this.prevSchedule.slug == 'jumat'){
-            return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date)) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).add(this.settings.jumat_duration, 'minutes')) ) ? true : false
+            return (this.clock.isSameOrAfter(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale)) && this.clock.isBefore(this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale).add(this.settings.jumat_duration, 'minutes')) ) ? true : false
 
           } else {
             return false
@@ -332,11 +325,19 @@
         
         if (this.$store.state.license == 'std' ) { return '' }
 
-        if(this.license_not_match === true){
-            return [{text: 'Lisensi alat tidak sesuai dengan nomor seri.'},{text: 'Silakan hubungi reseller/customer service'}]
+        if(this.$store.state.license_not_match === true){
+          return [
+            {text: 'Lisensi alat tidak sesuai dengan nomor seri.'},
+            {text: 'Silakan hubungi reseller/customer service'},
+            {text: 'WhatsApp: 0812.2806.2725 / jasmadigital@gmail.com'}
+          ]
         }
-        if(this.no_license === true){
-          return [{text: 'Tidak ditemukan kode lisensi pada mesin ini.'},{text: 'Silakan hubungi reseller/customer service'}]
+        if(this.$store.state.no_license === true){
+          return [
+            {text: 'Tidak ditemukan kode lisensi pada mesin ini.'},
+            {text: 'Silakan hubungi reseller/customer service'},
+            {text: 'WhatsApp: 0812.2806.2725 / jasmadigital@gmail.com'}
+          ]
         }
 
         var nk = this.nextKhotbah
@@ -344,9 +345,9 @@
         var t = this.fetched_tickers
         if(nk){
           if (nk.khotib.city != ""){
-            var ktext = "Khotib Jumat ("+this.$moment(nk.date).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
+            var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name + " dari "+nk.khotib.city+"."
           } else {
-            var ktext = "Khotib Jumat ("+this.$moment(nk.date).format('DD-MMM-YY')+"): "+nk.khotib.name
+            var ktext = "Khotib Jumat ("+this.$moment(nk.date).locale(this.$store.state.locale).format('DD-MMM-YY')+"): "+nk.khotib.name
           }
         }
         
@@ -390,13 +391,12 @@
 
         return j
         
-
       },
 
       generatedTimer(){
         if(this.prevSchedule && this.nextSchedule){
-          let prev = this.$moment(this.prevSchedule.time.date)
-          let next = this.$moment(this.nextSchedule.time.date)
+          let prev = this.$moment(this.prevSchedule.time.date).locale(this.$store.state.locale)
+          let next = this.$moment(this.nextSchedule.time.date).locale(this.$store.state.locale)
 
           var toward = this.$moment.preciseDiff(this.clock, next, true)
           var away = this.$moment.preciseDiff(this.clock, prev, true)
@@ -408,25 +408,23 @@
 
     methods: {
       init(){        
-        this.getLicense()
-        this.getBg()
+        this.getLicense()        
         this.getKhotbah()   
         this.getJumbotrons() 
         this.getSchedule()          
-        this.getTickers()
-        this.blink()
+        this.getTickers()        
         this.getHolidays()
         this.getPlayList() 
       },
 
       checkSettings(){
         this.axios.get('/f/check-settings')
-        .then(res=>{    
-
-          if (res.data != 0){            
+        .then(res=>{
+          var code = res.data.code
+          if ( code != 0){
             this.axios.put("/f/bot/1", { code: 0 })
             .then(res=>{              
-              this.reloadSettings()
+              this.reloadSettings(code)
             })
           }
         })
@@ -440,27 +438,48 @@
           this.axios.get('/set-audio-out/'+res.data.audio_output)
           this.$store.commit('locale', res.data.locale)
           this.$i18n.locale = this.$store.state.locale
+
         })
       },
 
-      reloadSettings(){ 
-        this.$refs.layout.stopFlux()
+      reloadSettings(code){  
+          // 10 = only load seting       
+          // 1 = background
+          // 2 = khotbah, ticker, jumbotron
+          // 3 = schedule
+          // 4 = holiday
+          // 5 = playlist
+        if (code == 99) {
+          // window.location.href = '/index.html'
+          this.$refs.layout.stopTicker()
+          this.$refs.layout.stopFlux()
+        }
+        this.init()
+        this.getBg()
         this.axios.get('/f/settings')
-        .then(res=>{             
-          this.init()
-          this.settings = res.data
+        .then(res=>{
+          this.settings = res.data          
           this.axios.get('/set-audio-out/'+res.data.audio_output)
           this.$store.commit('locale', res.data.locale)
           this.$i18n.locale = this.$store.state.locale          
-          
-      		this.$refs.layout.setFlux()
-     			this.$refs.layout.startFlux()	
-
-     			this.$swal({
-            type: 'success', showConfirmButton: false, timer:  2500,
+          if (code == 99){
+            this.$refs.layout.setFlux()
+            this.$refs.layout.setTicker()
+          }
+      	})
+        .then(all=>{
+          this.$swal({
+            type: 'success', showConfirmButton: false, timer:  1500,
             title: '<span style="font-family:Roboto">Update Pengaturan...SUKSES!.</span>'
           })
-      	})
+          .then(res=>{
+            // console.log(code)
+            if (code == 99){
+              this.$refs.layout.startFlux()
+              this.$refs.layout.startTicker()
+            }
+          })
+        })
       },
        
       getBg(){
@@ -509,10 +528,10 @@
         
         this.axios.get('/f/hwlic')
         .then(res=>{ 
-          this.no_license = false
-          if(res.data.hw != ''){          
+          this.$store.commit('no_license', false)
+          if(res.data.hw != ''){
             let hw = md5(res.data.hw)
-
+            
             let lc_demo = '';let lc_std = '';let lc_pro = ''
             let lc_std_t1 = '';let lc_std_t2 = '';let lc_std_t3 = '';let lc_std_t4 = '';
             let lc_pro_t1 = '';let lc_pro_t2 = '';let lc_pro_t3 = '';let lc_pro_t4 = '';
@@ -564,7 +583,7 @@
               this.$store.commit('license', 'pro') 
               this.axios.put('/f/settings/1', {layout_id: 4})
             } else {
-              this.license_not_match = true
+              this.$store.commit('license_not_match', true)
             }
 
           } else {
@@ -584,12 +603,13 @@
       },
 
       selectJumbotron(){
-        var jb = this.jumbotrons[this.jumbotronShown++]
-        if (this.jumbotronShown >= this.jumbotrons.length) this.jumbotronShown = 0;
+        if (this.counterBg === false && this.toAdzan === false && (this.$store.state.license == 'pro' || this.$store.state.license == 'demo' || this.$store.state.license == 'pcmode') ){
+
+          var jb = this.jumbotrons[this.jumbotronShown++]
+          if (this.jumbotronShown >= this.jumbotrons.length) this.jumbotronShown = 0;
         
-        if (this.counterBg === false && this.toAdzan === false) {
-          this.jumbotron = true  
-          setTimeout(()=>{this.jumbotron = false}, this.settings.jumbotron_duration * 1000);
+          this.$store.commit('jumbotron', true)
+          setTimeout(()=>{this.$store.commit('jumbotron', false)}, this.settings.jumbotron_duration * 1000);
         }        
       },
 
@@ -609,25 +629,25 @@
 
       blink(){
         this.strobe = true
-        setTimeout(()=>{this.strobe = false}, 700);
+        setTimeout(()=>{this.strobe = false}, 700);        
       },     
 
       getClock(){
         let interval = 1000
-        let clk = this.clock = this.$moment()        
+        let clk = this.clock = this.$moment().locale(this.$store.state.locale)  
         this.checkSettings()        
     
-        this.blink()        
-
-        if ( (parseInt(clk.format('X'))+6)/60 % this.settings.jumbotron_pause == 0) {
+        this.blink()
+        
+        if ( (parseInt(clk.format('X'))+6)/60 % this.settings.jumbotron_pause == 0) {          
           this.getLicense()
-          this.selectJumbotron()          
-        }
+          this.selectJumbotron()
+        }        
 
         if(this.nextSchedule) {
           var nextSc = this.nextSchedule
 
-          if(clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).format('hh:mm:ss')){                  
+          if(clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).locale(this.$store.state.locale).format('hh:mm:ss')){                  
             
             if(this.settings.buzzer_adzan !== null) {
               this.axios.get('/f/buzzer/'+this.settings.buzzer_adzan)
@@ -643,22 +663,23 @@
 
           }
 
+
           if(nextSc.start >0){
-            if (clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).subtract(nextSc.start, 'minutes').format('hh:mm:ss')){            
+            if (clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).locale(this.$store.state.locale).subtract(nextSc.start, 'minutes').format('hh:mm:ss')){            
               this.playingIndex = this.playList.findIndex(item=> {return item.id == this.nextSchedule.murottal.id})            
               this.audioIqomah.pause()
               this.playMurottal(0)
             }
           }
 
-          if (clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).subtract(nextSc.stop, 'minutes').format('hh:mm:ss')){   
+          if (clk.format('hh:mm:ss') == this.$moment(nextSc.time.date).locale(this.$store.state.locale).subtract(nextSc.stop, 'minutes').format('hh:mm:ss')){   
             this.audioMurottal.pause()
           }
         }
 
         if(this.prevSchedule) {
           var prevSc = this.prevSchedule
-          if(clk.format('hh:mm:ss') == this.$moment(prevSc.time.date).add(prevSc.iqomah_pause, 'minutes').format('hh:mm:ss')){
+          if(clk.format('hh:mm:ss') == this.$moment(prevSc.time.date).locale(this.$store.state.locale).add(prevSc.iqomah_pause, 'minutes').format('hh:mm:ss')){
             
             if(this.settings.buzzer_iqomah !== null) {
               this.axios.get('/f/buzzer/'+this.settings.buzzer_iqomah)
@@ -669,9 +690,7 @@
             if(this.prevSchedule.slug != 'jumat'){
               this.audioIqomah.src = this.$store.state.baseUrl+'/static/iqomah/'+ prevSc.iqomah.filename
               this.audioIqomah.load()            
-              this.audioIqomah.play()
-
-              
+              this.audioIqomah.play()              
 
             }
           }
@@ -679,16 +698,26 @@
 
         this.tm = setTimeout(this.getClock,1000)
       },
-
+ 
       playMurottal(ct){        
-        var entry = this.playList[this.playingIndex]      
+        var entry = this.playList[this.playingIndex]     
+
         if (this.playingIndex >= this.playList.length) this.playingIndex = 0
         
         this.audioMurottal.addEventListener("ended", this.playNextMurottal)
         //this.audioMurottal.currentTime = ct
         this.audioMurottal.src = this.$store.state.baseUrl + '/static/murottals/'+ entry.qori_id +'/'+ entry.filename         
+        
         this.audioMurottal.load()
-        this.audioMurottal.play()
+        var mrtPlay = this.audioMurottal.play()
+        // console.log(mrtPlay)
+        if (mrtPlay !== undefined) {
+          mrtPlay.then(function() {
+            // console.log('Played')
+          }).catch(function(error) {
+            // console.log(error)
+          }); 
+        }
       },
 
       stopMurottal(ct){              
@@ -714,8 +743,7 @@
     },
 
     beforeDestroy(){
-      clearTimeout(this.tm);
-      clearTimeout(this.ts);
+      clearTimeout(this.tm);      
     }
   }  
 </script>

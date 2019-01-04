@@ -1,9 +1,10 @@
 {
   "message": "hello",
   "Imsyak": "Imsak",
-  "Shubuh": "Fajr",
+  "Shubuh": "Fajr",  
   "Syuruq":"Syuruq",
   "Dzuhur": "Zuhr",
+  "Jumat" : "Jumu'ah",
   "Ashar": "Asr",
   "Maghrib": "Maghrib",
   "Isya": "Isha'",
